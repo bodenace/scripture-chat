@@ -17,12 +17,15 @@ const FREE_MESSAGE_LIMIT = 2;
 const STORAGE_KEY = 'scripturechat_anonymous_usage';
 
 function Home() {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, refreshUser } = useAuth();
   const navigate = useNavigate();
   
   // State
   const [messages, setMessages] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null); // Track current chat for authenticated users
+  const [chatHistory, setChatHistory] = useState([]); // List of past conversations
+  const [showHistory, setShowHistory] = useState(false); // Toggle history sidebar
+  const [historyLoading, setHistoryLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
@@ -50,8 +53,44 @@ function Home() {
       // Reset chat state when user logs in (start fresh)
       setCurrentChatId(null);
       setMessages([]);
+      // Fetch chat history for authenticated users
+      fetchChatHistory();
     }
   }, [isAuthenticated]);
+
+  /**
+   * Fetch chat history for authenticated users
+   */
+  const fetchChatHistory = async () => {
+    if (!isAuthenticated) return;
+    
+    setHistoryLoading(true);
+    try {
+      const response = await api.getChatHistory();
+      setChatHistory(response.data.chats || []);
+    } catch (err) {
+      console.error('Failed to fetch chat history:', err);
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  /**
+   * Load a previous conversation
+   */
+  const loadChat = async (chatId) => {
+    try {
+      const response = await api.getChat(chatId);
+      if (response.data.chat) {
+        setCurrentChatId(response.data.chat.id);
+        setMessages(response.data.chat.messages);
+        setShowHistory(false);
+      }
+    } catch (err) {
+      console.error('Failed to load chat:', err);
+      setError('Failed to load conversation. Please try again.');
+    }
+  };
 
   // Fetch verse of the day
   useEffect(() => {
@@ -127,8 +166,12 @@ function Home() {
           if (response.data.chat) {
             setCurrentChatId(response.data.chat.id);
             setMessages(response.data.chat.messages);
+            // Refresh chat history to show the new conversation
+            fetchChatHistory();
           }
         }
+        // Refresh user data to update question count
+        refreshUser();
       } else {
         // Anonymous user - use streaming API
         setStreaming(true);
@@ -213,6 +256,21 @@ function Home() {
     setCurrentChatId(null);
     setMessages([]);
     setError(null);
+    setShowHistory(false);
+  };
+
+  /**
+   * Format date for display
+   */
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffDays = Math.floor((now - date) / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    return date.toLocaleDateString();
   };
 
   // Calculate remaining messages for anonymous users
@@ -237,15 +295,23 @@ function Home() {
           <nav className="flex items-center space-x-3">
             {isAuthenticated ? (
               <>
-                {messages.length > 0 && (
-                  <button
-                    onClick={handleNewChat}
-                    className="btn-text text-sm"
-                    title="Start a new conversation"
-                  >
-                    + New Chat
-                  </button>
-                )}
+                <button
+                  onClick={handleNewChat}
+                  className="btn-text text-sm"
+                  title="Start a new conversation"
+                >
+                  + New Chat
+                </button>
+                <button
+                  onClick={() => {
+                    setShowHistory(!showHistory);
+                    if (!showHistory) fetchChatHistory();
+                  }}
+                  className="btn-text text-sm"
+                  title="View chat history"
+                >
+                  History
+                </button>
                 <span className="text-sm text-gray-600 hidden sm:inline">
                   {user?.name || user?.email}
                 </span>
@@ -266,6 +332,53 @@ function Home() {
           </nav>
         </div>
       </header>
+
+      {/* Chat History Panel */}
+      {isAuthenticated && showHistory && (
+        <div className="bg-white border-b border-gray-200 shadow-sm">
+          <div className="max-w-4xl mx-auto p-4">
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="font-medium text-scripture-navy">Your Conversations</h3>
+              <button 
+                onClick={() => setShowHistory(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                ✕
+              </button>
+            </div>
+            
+            {historyLoading ? (
+              <div className="text-center py-4 text-gray-500">Loading...</div>
+            ) : chatHistory.length === 0 ? (
+              <div className="text-center py-4 text-gray-500">
+                No previous conversations yet. Start chatting to save your history!
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {chatHistory.map((chat) => (
+                  <button
+                    key={chat.id}
+                    onClick={() => loadChat(chat.id)}
+                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                      currentChatId === chat.id
+                        ? 'bg-scripture-gold/10 border-scripture-gold'
+                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                    }`}
+                  >
+                    <div className="font-medium text-scripture-navy truncate">
+                      {chat.title}
+                    </div>
+                    <div className="text-sm text-gray-500 flex justify-between mt-1">
+                      <span>{chat.messageCount} messages</span>
+                      <span>{formatDate(chat.lastActivity)}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Main chat area */}
       <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
