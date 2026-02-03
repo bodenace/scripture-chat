@@ -22,6 +22,7 @@ function Home() {
   
   // State
   const [messages, setMessages] = useState([]);
+  const [currentChatId, setCurrentChatId] = useState(null); // Track current chat for authenticated users
   const [sending, setSending] = useState(false);
   const [streaming, setStreaming] = useState(false);
   const [streamingContent, setStreamingContent] = useState('');
@@ -32,7 +33,7 @@ function Home() {
   
   const messagesEndRef = useRef(null);
 
-  // Load anonymous usage from localStorage
+  // Load anonymous usage from localStorage OR reset for authenticated users
   useEffect(() => {
     if (!isAuthenticated) {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -45,6 +46,10 @@ function Home() {
           console.error('Failed to parse stored data:', e);
         }
       }
+    } else {
+      // Reset chat state when user logs in (start fresh)
+      setCurrentChatId(null);
+      setMessages([]);
     }
   }, [isAuthenticated]);
 
@@ -106,11 +111,23 @@ function Home() {
       
       if (isAuthenticated) {
         // Authenticated user - use API
-        response = await api.quickMessage(message);
-        
-        // Update with full chat from server
-        if (response.data.chat) {
-          setMessages(response.data.chat.messages);
+        if (currentChatId) {
+          // Continue existing conversation
+          response = await api.sendMessage(currentChatId, message);
+          
+          // Add the AI response to existing messages
+          if (response.data.message) {
+            setMessages(prev => [...prev, response.data.message]);
+          }
+        } else {
+          // Start new conversation
+          response = await api.quickMessage(message);
+          
+          // Save the chat ID for future messages
+          if (response.data.chat) {
+            setCurrentChatId(response.data.chat.id);
+            setMessages(response.data.chat.messages);
+          }
         }
       } else {
         // Anonymous user - use streaming API
@@ -189,6 +206,15 @@ function Home() {
     setShowSignupPrompt(false);
   };
 
+  /**
+   * Start a new conversation (for authenticated users)
+   */
+  const handleNewChat = () => {
+    setCurrentChatId(null);
+    setMessages([]);
+    setError(null);
+  };
+
   // Calculate remaining messages for anonymous users
   const remainingMessages = isAuthenticated 
     ? (user?.subscription === 'premium' ? Infinity : user?.usage?.remaining || 5)
@@ -211,6 +237,15 @@ function Home() {
           <nav className="flex items-center space-x-3">
             {isAuthenticated ? (
               <>
+                {messages.length > 0 && (
+                  <button
+                    onClick={handleNewChat}
+                    className="btn-text text-sm"
+                    title="Start a new conversation"
+                  >
+                    + New Chat
+                  </button>
+                )}
                 <span className="text-sm text-gray-600 hidden sm:inline">
                   {user?.name || user?.email}
                 </span>
