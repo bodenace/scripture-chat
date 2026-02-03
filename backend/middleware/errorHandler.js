@@ -3,6 +3,8 @@
  * Centralized error handling for the API
  */
 
+const Sentry = require('@sentry/node');
+
 /**
  * Custom API Error class
  */
@@ -28,6 +30,17 @@ const errorHandler = (err, req, res, next) => {
   // Log error in development
   if (process.env.NODE_ENV === 'development') {
     console.error('Error:', err);
+  }
+
+  // Report error to Sentry (only for server errors, not client errors)
+  if (err.statusCode >= 500 || !err.isOperational) {
+    Sentry.captureException(err, {
+      extra: {
+        url: req.originalUrl,
+        method: req.method,
+        userId: req.user?._id?.toString()
+      }
+    });
   }
 
   // Handle specific error types

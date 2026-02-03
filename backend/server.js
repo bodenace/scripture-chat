@@ -9,6 +9,26 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const passport = require('passport');
+const Sentry = require('@sentry/node');
+
+// Initialize Sentry (must be before other requires that might throw)
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    environment: process.env.NODE_ENV || 'development',
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    // Filter out sensitive data
+    beforeSend(event) {
+      // Remove sensitive headers
+      if (event.request?.headers) {
+        delete event.request.headers.authorization;
+        delete event.request.headers.cookie;
+      }
+      return event;
+    }
+  });
+  console.log('📊 Sentry error monitoring initialized');
+}
 
 // Import routes
 const authRoutes = require('./routes/auth');

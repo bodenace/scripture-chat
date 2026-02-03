@@ -131,6 +131,27 @@ const api = {
     return `${API_BASE_URL}/auth/google`;
   },
 
+  /**
+   * Request password reset email
+   */
+  forgotPassword(email) {
+    return apiClient.post('/auth/forgot-password', { email });
+  },
+
+  /**
+   * Verify password reset token
+   */
+  verifyResetToken(token) {
+    return apiClient.get(`/auth/verify-reset-token/${token}`);
+  },
+
+  /**
+   * Reset password with token
+   */
+  resetPassword(token, password) {
+    return apiClient.post(`/auth/reset-password/${token}`, { password });
+  },
+
   // ===========================================
   // Chat Endpoints
   // ===========================================

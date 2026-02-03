@@ -5,6 +5,7 @@
 
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = new mongoose.Schema({
   // Basic user information
@@ -25,6 +26,16 @@ const userSchema = new mongoose.Schema({
     type: String,
     trim: true,
     maxlength: [100, 'Name cannot exceed 100 characters']
+  },
+  
+  // Password reset fields
+  passwordResetToken: {
+    type: String,
+    select: false
+  },
+  passwordResetExpires: {
+    type: Date,
+    select: false
   },
   
   // Authentication method
@@ -227,6 +238,45 @@ function getNextMidnight() {
  */
 userSchema.statics.findByEmail = function(email) {
   return this.findOne({ email: email.toLowerCase() });
+};
+
+/**
+ * Generate password reset token
+ * @returns {string} - Unhashed reset token
+ */
+userSchema.methods.createPasswordResetToken = function() {
+  // Generate random token
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  
+  // Hash token and save to database
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+  
+  // Token expires in 1 hour
+  this.passwordResetExpires = Date.now() + 60 * 60 * 1000;
+  
+  // Return unhashed token (to send via email)
+  return resetToken;
+};
+
+/**
+ * Find user by reset token
+ * @param {string} token - Unhashed reset token
+ * @returns {User} - User document if token valid
+ */
+userSchema.statics.findByResetToken = function(token) {
+  // Hash the token to compare with database
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+  
+  return this.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  }).select('+passwordResetToken +passwordResetExpires');
 };
 
 const User = mongoose.model('User', userSchema);

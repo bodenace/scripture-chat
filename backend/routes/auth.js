@@ -11,6 +11,7 @@ const User = require('../models/User');
 const { protect, generateToken } = require('../middleware/auth');
 const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const { authLimiter } = require('../middleware/rateLimiter');
+const { sendPasswordResetEmail } = require('../utils/email');
 
 // ===========================================
 // Validation Rules
@@ -259,6 +260,137 @@ router.put('/password', protect, [
   res.json({
     success: true,
     message: 'Password changed successfully.'
+  });
+}));
+
+// ===========================================
+// Password Reset Routes
+// ===========================================
+
+/**
+ * @route   POST /api/auth/forgot-password
+ * @desc    Request password reset email
+ * @access  Public
+ */
+router.post('/forgot-password', authLimiter, [
+  body('email')
+    .isEmail()
+    .withMessage('Please enter a valid email address')
+    .normalizeEmail()
+], asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new ApiError(errors.array()[0].msg, 400);
+  }
+
+  const { email } = req.body;
+
+  // Find user by email
+  const user = await User.findByEmail(email);
+
+  // Always return success message (security: don't reveal if email exists)
+  const successMessage = 'If an account with that email exists, we\'ve sent password reset instructions.';
+
+  if (!user) {
+    // Don't reveal that user doesn't exist
+    return res.json({ success: true, message: successMessage });
+  }
+
+  // Check if user uses Google OAuth
+  if (user.authProvider === 'google' && !user.password) {
+    // Don't reveal this either, just return success
+    return res.json({ success: true, message: successMessage });
+  }
+
+  try {
+    // Generate reset token
+    const resetToken = user.createPasswordResetToken();
+    await user.save({ validateBeforeSave: false });
+
+    // Send email
+    await sendPasswordResetEmail(email, resetToken, process.env.FRONTEND_URL);
+
+    res.json({ success: true, message: successMessage });
+  } catch (error) {
+    // If email fails, clear the reset token
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    console.error('Password reset email error:', error);
+    throw new ApiError('There was an error sending the email. Please try again later.', 500);
+  }
+}));
+
+/**
+ * @route   POST /api/auth/reset-password/:token
+ * @desc    Reset password using token
+ * @access  Public
+ */
+router.post('/reset-password/:token', authLimiter, [
+  body('password')
+    .isLength({ min: 6 })
+    .withMessage('Password must be at least 6 characters')
+], asyncHandler(async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    throw new ApiError(errors.array()[0].msg, 400);
+  }
+
+  const { token } = req.params;
+  const { password } = req.body;
+
+  // Find user by reset token (validates token and expiry)
+  const user = await User.findByResetToken(token);
+
+  if (!user) {
+    throw new ApiError('Password reset token is invalid or has expired.', 400);
+  }
+
+  // Update password and clear reset token
+  user.password = password;
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // Generate new JWT token and log user in
+  const jwtToken = generateToken(user._id);
+
+  res.json({
+    success: true,
+    message: 'Password has been reset successfully. You are now logged in.',
+    data: {
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        subscription: user.subscription.status
+      },
+      token: jwtToken
+    }
+  });
+}));
+
+/**
+ * @route   GET /api/auth/verify-reset-token/:token
+ * @desc    Verify if reset token is valid (for frontend validation)
+ * @access  Public
+ */
+router.get('/verify-reset-token/:token', asyncHandler(async (req, res) => {
+  const { token } = req.params;
+
+  const user = await User.findByResetToken(token);
+
+  if (!user) {
+    throw new ApiError('Password reset token is invalid or has expired.', 400);
+  }
+
+  res.json({
+    success: true,
+    message: 'Token is valid.',
+    data: {
+      email: user.email.replace(/(.{2})(.*)(@.*)/, '$1***$3') // Partially hide email
+    }
   });
 }));
 

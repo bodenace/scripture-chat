@@ -18,13 +18,18 @@ function Login() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  // Check for session expired message
+  const [successMessage, setSuccessMessage] = useState('');
+
+  // Check for session expired message or success messages
   useEffect(() => {
     if (searchParams.get('session') === 'expired') {
       setError('Your session has expired. Please sign in again.');
     }
     if (searchParams.get('error') === 'google_auth_failed') {
       setError('Google sign-in failed. Please try again or use email.');
+    }
+    if (searchParams.get('reset') === 'success') {
+      setSuccessMessage('Password reset successfully! Please sign in with your new password.');
     }
   }, [searchParams]);
 
@@ -95,6 +100,16 @@ function Login() {
               Sign in to continue your scripture journey
             </p>
 
+            {/* Success message */}
+            {successMessage && (
+              <div 
+                className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6"
+                role="alert"
+              >
+                {successMessage}
+              </div>
+            )}
+
             {/* Error message */}
             {error && (
               <div 
@@ -125,9 +140,17 @@ function Login() {
               </div>
 
               <div>
-                <label htmlFor="password" className="label">
-                  Password
-                </label>
+                <div className="flex items-center justify-between">
+                  <label htmlFor="password" className="label">
+                    Password
+                  </label>
+                  <Link 
+                    to="/forgot-password" 
+                    className="text-sm text-scripture-navy hover:text-scripture-gold transition-colors"
+                  >
+                    Forgot password?
+                  </Link>
+                </div>
                 <input
                   type="password"
                   id="password"
