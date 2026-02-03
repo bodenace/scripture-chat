@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/cross.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- SEO and Accessibility Meta Tags -->
+    <meta name="description" content="ScriptureChat - Your faithful companion for exploring the Bible. Ask questions about scripture and receive biblically-grounded answers with verse references." />
+    <meta name="theme-color" content="#1e3a5f" />
+    
+    <!-- Edge/IE Compatibility -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    
+    <!-- PWA Support -->
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ScriptureChat" />
+    
+    <!-- Preconnect to API -->
+    <link rel="preconnect" href="http://localhost:5000" />
+    
+    <title>ScriptureChat - Biblical Wisdom at Your Fingertips</title>
+    
+    <!-- Inline critical styles for faster load -->
+    <style>
+      /* Prevent FOUC */
+      body {
+        margin: 0;
+        font-family: Georgia, Cambria, 'Times New Roman', serif;
+        background-color: #FDF8F3;
+        color: #1a1a1a;
+      }
+      
+      /* Loading spinner */
+      #loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #FDF8F3;
+        z-index: 9999;
+      }
+      
+      .spinner {
+        width: 50px;
+        height: 50px;
+        border: 4px solid #D4A574;
+        border-top-color: #1e3a5f;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+      }
+      
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Loading state -->
+    <div id="loading">
+      <div class="spinner"></div>
+    </div>
+    
+    <!-- React root -->
+    <div id="root"></div>
+    
+    <!-- Remove loading spinner once React loads -->
+    <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Remove loading spinner when page is ready
+      window.addEventListener('load', function() {
+        const loading = document.getElementById('loading');
+        if (loading) {
+          loading.style.opacity = '0';
+          setTimeout(() => loading.remove(), 300);
+        }
+      });
+    </script>
+    
+    <!-- Edge-specific fixes -->
+    <script>
+      // Polyfill for older Edge versions
+      if (!window.Promise) {
+        document.write('<script src="https://cdn.jsdelivr.net/npm/promise-polyfill@8/dist/polyfill.min.js"><\/script>');
+      }
+    </script>
+  </body>
+</html>
