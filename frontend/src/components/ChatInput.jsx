@@ -9,12 +9,16 @@ function ChatInput({ onSend, disabled = false, placeholder = "Ask a question abo
   const [message, setMessage] = useState('');
   const textareaRef = useRef(null);
 
-  // Auto-resize textarea
+  // Auto-resize textarea (expands up to ~3 lines before scrolling)
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = 'auto';
-      textarea.style.height = Math.min(textarea.scrollHeight, 150) + 'px';
+      // Allow expansion up to ~100px (about 3 lines) before scrolling
+      const maxHeight = 100;
+      textarea.style.height = Math.min(textarea.scrollHeight, maxHeight) + 'px';
+      // Only show scrollbar if content exceeds max height
+      textarea.style.overflowY = textarea.scrollHeight > maxHeight ? 'auto' : 'hidden';
     }
   }, [message]);
 
@@ -74,7 +78,7 @@ function ChatInput({ onSend, disabled = false, placeholder = "Ask a question abo
                        hover:border-gray-300
                        focus:border-scripture-navy focus:bg-white focus:ring-2 focus:ring-scripture-navy/20
                        disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{ minHeight: '56px', maxHeight: '150px' }}
+              style={{ minHeight: '56px', maxHeight: '100px', overflowY: 'hidden' }}
               aria-describedby="input-hint"
             />
             
