@@ -16,16 +16,12 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
-    // Optimize for production
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true
-      }
-    }
+    // Optimize for production (esbuild is default and faster than terser)
+    minify: 'esbuild'
   },
-  // Optimize for Edge browser compatibility
+  // Optimize for Edge browser compatibility and remove console.log in production
   esbuild: {
-    target: 'es2020'
+    target: 'es2020',
+    drop: ['console', 'debugger']
   }
 });
