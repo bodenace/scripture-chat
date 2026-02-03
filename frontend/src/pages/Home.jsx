@@ -195,9 +195,9 @@ function Home() {
     : Math.max(0, FREE_MESSAGE_LIMIT - messageCount);
 
   return (
-    <div className="min-h-screen bg-scripture-cream flex flex-col">
+    <div className="h-screen bg-scripture-cream flex flex-col overflow-hidden">
       {/* Header */}
-      <header className="bg-white shadow-soft">
+      <header className="bg-white shadow-soft flex-shrink-0">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
@@ -233,41 +233,26 @@ function Home() {
       </header>
 
       {/* Main chat area */}
-      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full">
+      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
         {/* Messages area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
           {/* Welcome message when empty */}
           {messages.length === 0 && !sending && (
-            <div className="h-full flex flex-col items-center justify-center text-center px-4 py-8">
-              <div className="w-20 h-20 bg-scripture-gold/20 rounded-full flex items-center justify-center mb-6">
-                <span className="text-4xl">📖</span>
+            <div className="flex flex-col items-center justify-center text-center px-4 py-4">
+              <div className="w-16 h-16 bg-scripture-gold/20 rounded-full flex items-center justify-center mb-4">
+                <span className="text-3xl">📖</span>
               </div>
-              <h2 className="text-3xl font-display text-scripture-navy mb-3">
+              <h2 className="text-2xl font-display text-scripture-navy mb-2">
                 Ask About Scripture
               </h2>
-              <p className="text-xl text-gray-600 max-w-lg mb-6">
+              <p className="text-lg text-gray-600 max-w-lg mb-4">
                 I'm here to help you explore the Bible and grow in your understanding 
                 of God's Word. Ask me anything about scripture!
               </p>
-
-              {/* Verse of the day */}
-              {verse && (
-                <div className="bg-white rounded-2xl shadow-soft p-6 max-w-lg mb-8">
-                  <p className="text-sm text-scripture-gold font-medium mb-2">
-                    📖 Verse of the Day
-                  </p>
-                  <blockquote className="text-lg text-gray-800 italic">
-                    "{verse.text}"
-                  </blockquote>
-                  <p className="mt-2 text-scripture-navy font-medium">
-                    — {verse.reference}
-                  </p>
-                </div>
-              )}
               
               {/* Suggested questions */}
               <div className="w-full max-w-lg space-y-2">
-                <p className="text-sm text-gray-500 mb-3">Try asking:</p>
+                <p className="text-sm text-gray-500 mb-2">Try asking:</p>
                 {[
                   "What does John 3:16 mean?",
                   "Explain the parable of the Good Samaritan",
@@ -277,8 +262,8 @@ function Home() {
                   <button
                     key={index}
                     onClick={() => handleSendMessage(suggestion)}
-                    className="w-full text-left px-5 py-4 bg-white rounded-xl border-2 border-gray-200 
-                             text-lg hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors"
+                    className="w-full text-left px-4 py-3 bg-white rounded-xl border-2 border-gray-200 
+                             text-base hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors"
                   >
                     {suggestion}
                   </button>
@@ -313,7 +298,7 @@ function Home() {
 
         {/* Error message */}
         {error && (
-          <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700">
+          <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex-shrink-0">
             {error}
             <button 
               onClick={() => setError(null)}
@@ -326,7 +311,7 @@ function Home() {
 
         {/* Messages remaining indicator */}
         {!isAuthenticated && messages.length > 0 && (
-          <div className="mx-4 mb-2 text-center">
+          <div className="mx-4 mb-2 text-center flex-shrink-0">
             <span className="text-sm text-gray-500">
               {remainingMessages > 0 ? (
                 <>
@@ -347,17 +332,19 @@ function Home() {
         )}
 
         {/* Chat input */}
-        <ChatInput 
-          onSend={handleSendMessage} 
-          disabled={sending || streaming || (!isAuthenticated && remainingMessages <= 0)}
-          placeholder={
-            streaming
-              ? "Receiving response..."
-              : !isAuthenticated && remainingMessages <= 0
-              ? "Subscribe to continue asking questions..."
-              : "Ask a question about scripture..."
-          }
-        />
+        <div className="flex-shrink-0">
+          <ChatInput 
+            onSend={handleSendMessage} 
+            disabled={sending || streaming || (!isAuthenticated && remainingMessages <= 0)}
+            placeholder={
+              streaming
+                ? "Receiving response..."
+                : !isAuthenticated && remainingMessages <= 0
+                ? "Subscribe to continue asking questions..."
+                : "Ask a question about scripture..."
+            }
+          />
+        </div>
       </main>
 
       {/* Payment prompt modal */}
