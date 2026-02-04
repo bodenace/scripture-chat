@@ -621,6 +621,13 @@ function Home() {
                   : "Ask a question about scripture..."
               }
             />
+            
+            {/* Footer links */}
+            <div className="text-center mt-3 text-xs text-gray-400">
+              <Link to="/privacy" className="hover:text-gray-600 transition-colors">Privacy Policy</Link>
+              <span className="mx-2">•</span>
+              <Link to="/terms" className="hover:text-gray-600 transition-colors">Terms of Service</Link>
+            </div>
           </div>
 
           {/* Payment prompt modal */}

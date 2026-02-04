@@ -18,6 +18,8 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const AuthCallback = lazy(() => import('./pages/AuthCallback'));
 const ForgotPassword = lazy(() => import('./pages/ForgotPassword'));
 const ResetPassword = lazy(() => import('./pages/ResetPassword'));
+const Privacy = lazy(() => import('./pages/Privacy'));
+const Terms = lazy(() => import('./pages/Terms'));
 
 /**
  * Protected Route wrapper
@@ -63,6 +65,10 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* Legal pages */}
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/terms" element={<Terms />} />
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />

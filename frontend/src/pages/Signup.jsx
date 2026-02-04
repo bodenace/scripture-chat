@@ -271,7 +271,10 @@ function Signup() {
 
             {/* Terms notice */}
             <p className="text-center mt-4 text-xs text-gray-500">
-              Secure payment via Stripe. By subscribing, you agree to our terms.
+              Secure payment via Stripe. By subscribing, you agree to our{' '}
+              <Link to="/terms" className="text-scripture-navy hover:underline">Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy" className="text-scripture-navy hover:underline">Privacy Policy</Link>.
             </p>
           </div>
         </div>
