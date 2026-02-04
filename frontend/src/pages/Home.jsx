@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
 import ChatInput from '../components/ChatInput';
@@ -18,13 +18,13 @@ const STORAGE_KEY = 'scripturechat_anonymous_usage';
 
 function Home() {
   const { user, isAuthenticated, refreshUser } = useAuth();
-  const navigate = useNavigate();
   
   // State
   const [messages, setMessages] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null); // Track current chat for authenticated users
   const [chatHistory, setChatHistory] = useState([]); // List of past conversations
-  const [showHistory, setShowHistory] = useState(false); // Toggle history sidebar
+  const [sidebarOpen, setSidebarOpen] = useState(true); // Sidebar visibility (desktop)
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false); // Mobile sidebar
   const [historyLoading, setHistoryLoading] = useState(false);
   const [sending, setSending] = useState(false);
   const [streaming, setStreaming] = useState(false);
@@ -84,7 +84,6 @@ function Home() {
       if (response.data.chat) {
         setCurrentChatId(response.data.chat.id);
         setMessages(response.data.chat.messages);
-        setShowHistory(false);
       }
     } catch (err) {
       console.error('Failed to load chat:', err);
@@ -256,7 +255,6 @@ function Home() {
     setCurrentChatId(null);
     setMessages([]);
     setError(null);
-    setShowHistory(false);
   };
 
   /**
@@ -279,228 +277,360 @@ function Home() {
     : Math.max(0, FREE_MESSAGE_LIMIT - messageCount);
 
   return (
-    <div className="h-screen bg-scripture-cream flex flex-col overflow-hidden">
-      {/* Header */}
-      <header className="bg-white shadow-soft flex-shrink-0">
-        <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
+    <div className="h-screen bg-scripture-cream flex overflow-hidden">
+      {/* Sidebar for authenticated users */}
+      {isAuthenticated && (
+        <>
+          {/* Desktop Sidebar */}
+          <aside 
+            className={`hidden md:flex flex-col bg-scripture-navy text-white transition-all duration-300 ${
+              sidebarOpen ? 'w-72' : 'w-0'
+            } overflow-hidden`}
+          >
+            <div className="flex-shrink-0 p-4 border-b border-white/10">
+              <button
+                onClick={handleNewChat}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 
+                         rounded-lg transition-colors text-white font-medium"
+              >
+                <span className="text-lg">+</span>
+                New Chat
+              </button>
             </div>
-            <h1 className="text-xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
-          </div>
-          
-          <nav className="flex items-center space-x-3">
-            {isAuthenticated ? (
-              <>
-                <button
-                  onClick={handleNewChat}
-                  className="btn-text text-sm"
-                  title="Start a new conversation"
-                >
-                  + New Chat
-                </button>
-                <button
-                  onClick={() => {
-                    setShowHistory(!showHistory);
-                    if (!showHistory) fetchChatHistory();
-                  }}
-                  className="btn-text text-sm"
-                  title="View chat history"
-                >
-                  History
-                </button>
-                <span className="text-sm text-gray-600 hidden sm:inline">
-                  {user?.name || user?.email}
-                </span>
-                <Link to="/dashboard" className="btn-text">
-                  My Account
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login" className="btn-text">
-                  Sign In
-                </Link>
-                <Link to="/signup" className="btn-primary py-2 px-4">
-                  Subscribe - $4.99/mo
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+            
+            <div className="flex-1 overflow-y-auto p-3">
+              <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider px-2 mb-3">
+                Chat History
+              </h3>
+              
+              {historyLoading ? (
+                <div className="text-center py-4 text-white/50">Loading...</div>
+              ) : chatHistory.length === 0 ? (
+                <div className="text-center py-4 text-white/50 text-sm px-2">
+                  No conversations yet. Start chatting to save your history!
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {chatHistory.map((chat) => (
+                    <button
+                      key={chat.id}
+                      onClick={() => loadChat(chat.id)}
+                      className={`w-full text-left p-3 rounded-lg transition-colors group ${
+                        currentChatId === chat.id
+                          ? 'bg-scripture-gold/20 text-scripture-gold'
+                          : 'hover:bg-white/10 text-white/80'
+                      }`}
+                    >
+                      <div className="font-medium truncate text-sm">
+                        {chat.title}
+                      </div>
+                      <div className="text-xs text-white/40 mt-1 flex justify-between">
+                        <span>{chat.messageCount} msgs</span>
+                        <span>{formatDate(chat.lastActivity)}</span>
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            {/* Sidebar footer */}
+            <div className="flex-shrink-0 p-3 border-t border-white/10">
+              <Link 
+                to="/dashboard" 
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors"
+              >
+                <div className="w-8 h-8 bg-scripture-gold/20 rounded-full flex items-center justify-center">
+                  <span className="text-scripture-gold text-sm">
+                    {user?.name?.[0] || user?.email?.[0] || '?'}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-medium truncate">
+                    {user?.name || 'My Account'}
+                  </div>
+                  <div className="text-xs text-white/50 truncate">
+                    {user?.email}
+                  </div>
+                </div>
+              </Link>
+            </div>
+          </aside>
 
-      {/* Chat History Panel */}
-      {isAuthenticated && showHistory && (
-        <div className="bg-white border-b border-gray-200 shadow-sm">
-          <div className="max-w-4xl mx-auto p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-medium text-scripture-navy">Your Conversations</h3>
-              <button 
-                onClick={() => setShowHistory(false)}
-                className="text-gray-500 hover:text-gray-700"
+          {/* Mobile Sidebar Overlay */}
+          {mobileSidebarOpen && (
+            <div 
+              className="md:hidden fixed inset-0 bg-black/50 z-40"
+              onClick={() => setMobileSidebarOpen(false)}
+            />
+          )}
+
+          {/* Mobile Sidebar */}
+          <aside 
+            className={`md:hidden fixed inset-y-0 left-0 z-50 w-72 bg-scripture-navy text-white transform transition-transform duration-300 ${
+              mobileSidebarOpen ? 'translate-x-0' : '-translate-x-full'
+            }`}
+          >
+            <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between">
+              <span className="font-display text-lg">ScriptureChat</span>
+              <button
+                onClick={() => setMobileSidebarOpen(false)}
+                className="p-2 hover:bg-white/10 rounded-lg"
               >
                 ✕
               </button>
             </div>
             
-            {historyLoading ? (
-              <div className="text-center py-4 text-gray-500">Loading...</div>
-            ) : chatHistory.length === 0 ? (
-              <div className="text-center py-4 text-gray-500">
-                No previous conversations yet. Start chatting to save your history!
-              </div>
-            ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto">
-                {chatHistory.map((chat) => (
-                  <button
-                    key={chat.id}
-                    onClick={() => loadChat(chat.id)}
-                    className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                      currentChatId === chat.id
-                        ? 'bg-scripture-gold/10 border-scripture-gold'
-                        : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
-                    }`}
-                  >
-                    <div className="font-medium text-scripture-navy truncate">
-                      {chat.title}
-                    </div>
-                    <div className="text-sm text-gray-500 flex justify-between mt-1">
-                      <span>{chat.messageCount} messages</span>
-                      <span>{formatDate(chat.lastActivity)}</span>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
+            <div className="p-4">
+              <button
+                onClick={() => {
+                  handleNewChat();
+                  setMobileSidebarOpen(false);
+                }}
+                className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 
+                         rounded-lg transition-colors text-white font-medium"
+              >
+                <span className="text-lg">+</span>
+                New Chat
+              </button>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-3">
+              <h3 className="text-xs font-semibold text-white/50 uppercase tracking-wider px-2 mb-3">
+                Chat History
+              </h3>
+              
+              {historyLoading ? (
+                <div className="text-center py-4 text-white/50">Loading...</div>
+              ) : chatHistory.length === 0 ? (
+                <div className="text-center py-4 text-white/50 text-sm px-2">
+                  No conversations yet.
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {chatHistory.map((chat) => (
+                    <button
+                      key={chat.id}
+                      onClick={() => {
+                        loadChat(chat.id);
+                        setMobileSidebarOpen(false);
+                      }}
+                      className={`w-full text-left p-3 rounded-lg transition-colors ${
+                        currentChatId === chat.id
+                          ? 'bg-scripture-gold/20 text-scripture-gold'
+                          : 'hover:bg-white/10 text-white/80'
+                      }`}
+                    >
+                      <div className="font-medium truncate text-sm">
+                        {chat.title}
+                      </div>
+                      <div className="text-xs text-white/40 mt-1">
+                        {formatDate(chat.lastActivity)}
+                      </div>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            
+            <div className="p-3 border-t border-white/10">
+              <Link 
+                to="/dashboard" 
+                className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/10 transition-colors"
+                onClick={() => setMobileSidebarOpen(false)}
+              >
+                <div className="w-8 h-8 bg-scripture-gold/20 rounded-full flex items-center justify-center">
+                  <span className="text-scripture-gold text-sm">
+                    {user?.name?.[0] || user?.email?.[0] || '?'}
+                  </span>
+                </div>
+                <span className="text-sm">My Account</span>
+              </Link>
+            </div>
+          </aside>
+        </>
       )}
 
-      {/* Main chat area */}
-      <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
-        {/* Messages area */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-          {/* Welcome message when empty */}
-          {messages.length === 0 && !sending && (
-            <div className="flex flex-col items-center justify-center text-center px-4 py-4">
-              <div className="w-16 h-16 bg-scripture-gold/20 rounded-full flex items-center justify-center mb-4">
-                <span className="text-3xl">📖</span>
-              </div>
-              <h2 className="text-2xl font-display text-scripture-navy mb-2">
-                Ask About Scripture
-              </h2>
-              <p className="text-lg text-gray-600 max-w-lg mb-4">
-                I'm here to help you explore the Bible and grow in your understanding 
-                of God's Word. Ask me anything about scripture!
-              </p>
-              
-              {/* Suggested questions */}
-              <div className="w-full max-w-lg space-y-2">
-                <p className="text-sm text-gray-500 mb-2">Try asking:</p>
-                {[
-                  "What does John 3:16 mean?",
-                  "Explain the parable of the Good Samaritan",
-                  "What does the Bible say about forgiveness?",
-                  "Who was King David?"
-                ].map((suggestion, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSendMessage(suggestion)}
-                    className="w-full text-left px-4 py-3 bg-white rounded-xl border-2 border-gray-200 
-                             text-base hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Chat messages */}
-          {messages.map((message, index) => (
-            <ChatBubble
-              key={message.id || index}
-              message={message}
-            />
-          ))}
-
-          {/* Sending indicator - only show when not streaming (streaming shows in the message itself) */}
-          {sending && !streaming && (
-            <div className="chat-bubble-assistant">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                <span className="ml-2 text-gray-500">Thinking about your question...</span>
-              </div>
-            </div>
-          )}
-
-          {/* Scroll anchor */}
-          <div ref={messagesEndRef} />
-        </div>
-
-        {/* Error message */}
-        {error && (
-          <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex-shrink-0">
-            {error}
-            <button 
-              onClick={() => setError(null)}
-              className="ml-2 text-red-500 hover:text-red-700 font-medium"
-            >
-              Dismiss
-            </button>
-          </div>
-        )}
-
-        {/* Messages remaining indicator */}
-        {!isAuthenticated && messages.length > 0 && (
-          <div className="mx-4 mb-2 text-center flex-shrink-0">
-            <span className="text-sm text-gray-500">
-              {remainingMessages > 0 ? (
+      {/* Main content area */}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Header */}
+        <header className="bg-white shadow-soft flex-shrink-0">
+          <div className="px-4 py-3 flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              {/* Sidebar toggle for authenticated users */}
+              {isAuthenticated && (
                 <>
-                  <span className="font-medium text-scripture-navy">{remainingMessages}</span>  
-                  {remainingMessages === 1 ? ' free question' : ' free questions'} remaining
-                  {' • '}
-                  <Link to="/signup" className="text-scripture-navy underline hover:text-primary-600">
-                    Get unlimited access
+                  {/* Desktop toggle */}
+                  <button
+                    onClick={() => setSidebarOpen(!sidebarOpen)}
+                    className="hidden md:flex p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={sidebarOpen ? 'Hide sidebar' : 'Show sidebar'}
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                  {/* Mobile toggle */}
+                  <button
+                    onClick={() => setMobileSidebarOpen(true)}
+                    className="md:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                  </button>
+                </>
+              )}
+              
+              <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
+                <span className="text-white text-xl">✝</span>
+              </div>
+              <h1 className="text-xl font-display text-scripture-navy">
+                ScriptureChat
+              </h1>
+            </div>
+            
+            <nav className="flex items-center space-x-3">
+              {isAuthenticated ? (
+                <Link to="/dashboard" className="btn-text text-sm md:hidden">
+                  Account
+                </Link>
+              ) : (
+                <>
+                  <Link to="/login" className="btn-text">
+                    Sign In
+                  </Link>
+                  <Link to="/signup" className="btn-primary py-2 px-4">
+                    Subscribe - $4.99/mo
                   </Link>
                 </>
-              ) : (
-                <Link to="/signup" className="text-scripture-navy font-medium underline">
-                  Get unlimited access for $4.99/month
-                </Link>
               )}
-            </span>
+            </nav>
           </div>
-        )}
+        </header>
 
-        {/* Chat input */}
-        <div className="flex-shrink-0">
-          <ChatInput 
-            onSend={handleSendMessage} 
-            disabled={sending || streaming || (!isAuthenticated && remainingMessages <= 0)}
-            placeholder={
-              streaming
-                ? "Receiving response..."
-                : !isAuthenticated && remainingMessages <= 0
-                ? "Subscribe to continue asking questions..."
-                : "Ask a question about scripture..."
-            }
-          />
-        </div>
-      </main>
+        {/* Main chat area */}
+        <main className="flex-1 flex flex-col max-w-4xl mx-auto w-full min-h-0">
+          {/* Messages area */}
+          <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+            {/* Welcome message when empty */}
+            {messages.length === 0 && !sending && (
+              <div className="flex flex-col items-center justify-center text-center px-4 py-4">
+                <div className="w-16 h-16 bg-scripture-gold/20 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-3xl">📖</span>
+                </div>
+                <h2 className="text-2xl font-display text-scripture-navy mb-2">
+                  Ask About Scripture
+                </h2>
+                <p className="text-lg text-gray-600 max-w-lg mb-4">
+                  I'm here to help you explore the Bible and grow in your understanding 
+                  of God's Word. Ask me anything about scripture!
+                </p>
+                
+                {/* Suggested questions */}
+                <div className="w-full max-w-lg space-y-2">
+                  <p className="text-sm text-gray-500 mb-2">Try asking:</p>
+                  {[
+                    "What does John 3:16 mean?",
+                    "Explain the parable of the Good Samaritan",
+                    "What does the Bible say about forgiveness?",
+                    "Who was King David?"
+                  ].map((suggestion, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleSendMessage(suggestion)}
+                      className="w-full text-left px-4 py-3 bg-white rounded-xl border-2 border-gray-200 
+                               text-base hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors"
+                    >
+                      {suggestion}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
 
-      {/* Payment prompt modal */}
-      {showSignupPrompt && (
-        <SignupPrompt
-          onClose={handleClosePrompt}
-        />
-      )}
+            {/* Chat messages */}
+            {messages.map((message, index) => (
+              <ChatBubble
+                key={message.id || index}
+                message={message}
+              />
+            ))}
+
+            {/* Sending indicator - only show when not streaming (streaming shows in the message itself) */}
+            {sending && !streaming && (
+              <div className="chat-bubble-assistant">
+                <div className="flex items-center space-x-2">
+                  <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <div className="w-2 h-2 bg-scripture-gold rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                  <span className="ml-2 text-gray-500">Thinking about your question...</span>
+                </div>
+              </div>
+            )}
+
+            {/* Scroll anchor */}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Error message */}
+          {error && (
+            <div className="mx-4 mb-4 p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 flex-shrink-0">
+              {error}
+              <button 
+                onClick={() => setError(null)}
+                className="ml-2 text-red-500 hover:text-red-700 font-medium"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* Messages remaining indicator */}
+          {!isAuthenticated && messages.length > 0 && (
+            <div className="mx-4 mb-2 text-center flex-shrink-0">
+              <span className="text-sm text-gray-500">
+                {remainingMessages > 0 ? (
+                  <>
+                    <span className="font-medium text-scripture-navy">{remainingMessages}</span>  
+                    {remainingMessages === 1 ? ' free question' : ' free questions'} remaining
+                    {' • '}
+                    <Link to="/signup" className="text-scripture-navy underline hover:text-primary-600">
+                      Get unlimited access
+                    </Link>
+                  </>
+                ) : (
+                  <Link to="/signup" className="text-scripture-navy font-medium underline">
+                    Get unlimited access for $4.99/month
+                  </Link>
+                )}
+              </span>
+            </div>
+          )}
+
+          {/* Chat input */}
+          <div className="flex-shrink-0 pb-4">
+            <ChatInput 
+              onSend={handleSendMessage} 
+              disabled={sending || streaming || (!isAuthenticated && remainingMessages <= 0)}
+              placeholder={
+                streaming
+                  ? "Receiving response..."
+                  : !isAuthenticated && remainingMessages <= 0
+                  ? "Subscribe to continue asking questions..."
+                  : "Ask a question about scripture..."
+              }
+            />
+          </div>
+
+          {/* Payment prompt modal */}
+          {showSignupPrompt && (
+            <SignupPrompt
+              onClose={handleClosePrompt}
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 }
