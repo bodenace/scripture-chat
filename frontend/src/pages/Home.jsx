@@ -1,7 +1,7 @@
 /**
  * Home Page
  * Main chat interface - accessible to everyone
- * Prompts account creation after 5 free messages
+ * Prompts account creation after 25 free messages
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +13,7 @@ import ChatBubble from '../components/ChatBubble';
 import SignupPrompt from '../components/SignupPrompt';
 
 // Number of free messages before requiring signup
-const FREE_MESSAGE_LIMIT = 2;
+const FREE_MESSAGE_LIMIT = 25;
 const STORAGE_KEY = 'scripturechat_anonymous_usage';
 
 function Home() {
@@ -501,7 +501,7 @@ function Home() {
                     Sign In
                   </Link>
                   <Link to="/signup" className="btn-primary py-2 px-4">
-                    Subscribe - $4.99/mo
+                    Subscribe 
                   </Link>
                 </>
               )}
