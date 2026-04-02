@@ -599,23 +599,24 @@ function Home() {
           <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
             {/* Welcome message when empty */}
             {messages.length === 0 && !sending && (
-              <div className="flex flex-col items-center justify-center text-center px-4 py-4">
-                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4">
-                  <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-16 h-16" />
+              <div className="flex flex-col items-center justify-center text-center px-2 sm:px-4 py-2 sm:py-4">
+                <div className="w-10 h-10 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mb-2 sm:mb-4">
+                  <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-10 h-10 sm:w-16 sm:h-16" />
                 </div>
-                <h2 className="text-2xl font-display text-scripture-navy mb-2">
+                <h2 className="text-xl sm:text-2xl font-display text-scripture-navy mb-2">
                   {greeting}
                 </h2>
                 
-                {/* Suggested questions */}
-                <div className="w-full max-w-lg space-y-2">
-                  <p className="text-sm text-gray-500 mb-2">Try asking:</p>
+                {/* Suggested questions -- hide 4th on short viewports */}
+                <div className="w-full max-w-lg space-y-1.5 sm:space-y-2">
+                  <p className="text-sm text-gray-500 mb-1 sm:mb-2">Try asking:</p>
                   {suggestedQuestions.map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => handleSendMessage(suggestion)}
-                      className="w-full text-left px-4 py-3 bg-white rounded-xl border-2 border-gray-200 
-                               text-base hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors"
+                      className={`w-full text-left px-3 py-2 sm:px-4 sm:py-3 bg-white rounded-xl border-2 border-gray-200 
+                               text-sm sm:text-base hover:border-scripture-gold hover:bg-scripture-gold/5 transition-colors
+                               ${index === 3 ? 'hidden tall:block' : ''}`}
                     >
                       {suggestion}
                     </button>

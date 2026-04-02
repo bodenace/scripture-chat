@@ -5,6 +5,15 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   theme: {
+    screens: {
+      'sm': '640px',
+      'md': '768px',
+      'lg': '1024px',
+      'xl': '1280px',
+      '2xl': '1536px',
+      'tall': { 'raw': '(min-height: 700px)' },
+      'short': { 'raw': '(max-height: 699px)' },
+    },
     extend: {
       // Custom colors for a warm, faith-inspired theme
       colors: {
