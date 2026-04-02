@@ -1,6 +1,6 @@
 /**
  * Home Page
- * Main chat interface - accessible to everyone
+ * Main chat interface for Faith AI - accessible to everyone
  * Prompts account creation after 25 free messages
  */
 
@@ -14,7 +14,7 @@ import SignupPrompt from '../components/SignupPrompt';
 
 // Number of free messages before requiring signup
 const FREE_MESSAGE_LIMIT = 25;
-const STORAGE_KEY = 'scripturechat_anonymous_usage';
+const STORAGE_KEY = 'faithai_anonymous_usage';
 
 function Home() {
   const { user, isAuthenticated, refreshUser } = useAuth();
@@ -35,6 +35,95 @@ function Home() {
   const [verse, setVerse] = useState(null);
   
   const messagesEndRef = useRef(null);
+  const [greeting] = useState(() => {
+    const greetings = [
+      "Let's do something meaningful today",
+      "What's on your heart today?",
+      "Glad you're here",
+      "Let's seek wisdom together",
+      "What would you like to learn today?",
+      "Take a moment. You're in the right place.",
+      "Let's find some answers together",
+      "Ready when you are",
+      "There's always more to discover",
+      "What's been on your mind lately?",
+      "Let's make today count",
+      "You've got questions. Let's explore."
+    ];
+    return greetings[Math.floor(Math.random() * greetings.length)];
+  });
+
+  const [suggestedQuestions] = useState(() => {
+    const scriptureQuestions = [
+      "What does Moroni 10:4-5 actually mean in simple terms?",
+      "Can you explain 2 Nephi 2 like I'm new to it?",
+      "What is Alma 32 teaching about faith step-by-step?",
+      "What does Mosiah 2:17 really mean in context?",
+      "Can you break down Doctrine and Covenants 121:34-46?",
+      "What does the Book of Mormon teach about repentance?",
+      "What do the scriptures say about dealing with anxiety or fear?",
+      "What does the Doctrine and Covenants teach about revelation?",
+      "What do the scriptures say about forgiveness?",
+      "How is the Atonement described across different scriptures?",
+      "How can I apply Alma 37:6 in my daily life?",
+      "What scripture should I read if I'm feeling lost right now?",
+      "What verses help when I feel discouraged or unmotivated?",
+      "How do I actually \"liken the scriptures\" to myself?",
+      "What are some scriptures that help with making decisions?",
+      "What can I learn from Nephi's response to hard things?",
+      "Why is the story of the stripling warriors so important?",
+      "What lessons come from Alma the Younger's conversion?",
+      "What does the brother of Jared teach us about faith?",
+      "How do I study the scriptures in a way that actually sticks?",
+      "What does the Book of Mormon teach about the Atonement?",
+      "Explain the Plan of Salvation",
+      "What is the purpose of temples?",
+      "What does Moroni 10:4-5 mean?"
+    ];
+
+    const normalQuestions = [
+      "How do I stay consistent with scripture study when I'm busy?",
+      "What should I pray about if I don't know what to say?",
+      "How do I make sacrament meeting more meaningful?",
+      "What should I say when asked to give a talk last minute?",
+      "What's a simple way to teach a good lesson in church?",
+      "How do I not feel awkward in my calling?",
+      "Is this okay to do on Sunday?",
+      "Where's the line with the Word of Wisdom?",
+      "How strict do I need to be with media (movies, music, etc.)?",
+      "What does modesty actually mean today?",
+      "How do I explain my beliefs without sounding weird?",
+      "How do I stay strong in my faith at work or school?",
+      "How do I balance career goals with church responsibilities?",
+      "How do I raise kids in the gospel without forcing it?"
+    ];
+
+    const vulnerableQuestions = [
+      "Is it bad if I don't feel anything when I pray?",
+      "How do I know if something is the Spirit or just my thoughts?",
+      "How can I feel closer to God again?",
+      "What do I do when I feel spiritually burnt out?",
+      "What if I don't agree with something said at church?",
+      "How do I deal with guilt even after I've repented?",
+      "Why do I feel like I'm not \"good enough\" spiritually?",
+      "What do I do if I keep making the same mistake?",
+      "Is it wrong that I struggle to live certain commandments?",
+      "How do I date as a Latter-day Saint in today's world?",
+      "How do I talk to friends who left the Church?",
+      "What if my family doesn't support my faith?",
+      "What should I do if I don't feel like going to church?"
+    ];
+
+    const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+
+    const scripture2 = pick(scriptureQuestions, 2);
+    const includeVulnerable = Math.random() < 0.5;
+    const others = includeVulnerable
+      ? [...pick(normalQuestions, 1), ...pick(vulnerableQuestions, 1)]
+      : pick(normalQuestions, 2);
+
+    return [...scripture2, ...others].sort(() => Math.random() - 0.5);
+  });
 
   // Load anonymous usage from localStorage OR reset for authenticated users
   useEffect(() => {
@@ -372,7 +461,7 @@ function Home() {
             }`}
           >
             <div className="flex-shrink-0 p-4 border-b border-white/10 flex items-center justify-between">
-              <span className="font-display text-lg">ScriptureChat</span>
+              <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-8" />
               <button
                 onClick={() => setMobileSidebarOpen(false)}
                 className="p-2 hover:bg-white/10 rounded-lg"
@@ -482,12 +571,7 @@ function Home() {
                 </>
               )}
               
-              <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-                <span className="text-white text-xl">✝</span>
-              </div>
-              <h1 className="text-xl font-display text-scripture-navy">
-                ScriptureChat
-              </h1>
+              <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
             </div>
             
             <nav className="flex items-center space-x-3">
@@ -516,26 +600,17 @@ function Home() {
             {/* Welcome message when empty */}
             {messages.length === 0 && !sending && (
               <div className="flex flex-col items-center justify-center text-center px-4 py-4">
-                <div className="w-16 h-16 bg-scripture-gold/20 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-3xl">📖</span>
+                <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4">
+                  <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-16 h-16" />
                 </div>
                 <h2 className="text-2xl font-display text-scripture-navy mb-2">
-                  Ask About Scripture
+                  {greeting}
                 </h2>
-                <p className="text-lg text-gray-600 max-w-lg mb-4">
-                  I'm here to help you explore the Bible and grow in your understanding 
-                  of God's Word. Ask me anything about scripture!
-                </p>
                 
                 {/* Suggested questions */}
                 <div className="w-full max-w-lg space-y-2">
                   <p className="text-sm text-gray-500 mb-2">Try asking:</p>
-                  {[
-                    "What does John 3:16 mean?",
-                    "Explain the parable of the Good Samaritan",
-                    "What does the Bible say about forgiveness?",
-                    "Who was King David?"
-                  ].map((suggestion, index) => (
+                  {suggestedQuestions.map((suggestion, index) => (
                     <button
                       key={index}
                       onClick={() => handleSendMessage(suggestion)}
@@ -618,7 +693,7 @@ function Home() {
                   ? "Receiving response..."
                   : !isAuthenticated && remainingMessages <= 0
                   ? "Subscribe to continue asking questions..."
-                  : "Ask a question about scripture..."
+                  : "Ask a gospel question..."
               }
             />
             

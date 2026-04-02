@@ -1,5 +1,5 @@
 /**
- * Main entry point for ScriptureChat
+ * Main entry point for Faith AI
  */
 
 import React from 'react';
@@ -48,9 +48,7 @@ function ErrorFallback() {
   return (
     <div className="min-h-screen bg-scripture-cream flex items-center justify-center p-4">
       <div className="text-center max-w-md">
-        <div className="w-16 h-16 bg-scripture-navy rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-white text-3xl">✝</span>
-        </div>
+        <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-16 mx-auto mb-4" />
         <h1 className="text-2xl font-display text-scripture-navy mb-4">
           Something Went Wrong
         </h1>
@@ -64,7 +62,7 @@ function ErrorFallback() {
           Refresh Page
         </button>
         <p className="text-sm text-gray-500 mt-6 italic">
-          "For I know the plans I have for you, declares the Lord" — Jeremiah 29:11
+          "Look unto me in every thought; doubt not, fear not." — D&C 6:36
         </p>
       </div>
     </div>

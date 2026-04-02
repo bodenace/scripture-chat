@@ -1,7 +1,7 @@
 {
-  "name": "scripturechat",
+  "name": "faith-ai",
   "version": "1.0.0",
-  "description": "A Christian scripture-focused ChatGPT wrapper application",
+  "description": "A Latter-day Saint scripture-focused AI application",
   "private": true,
   "scripts": {
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",

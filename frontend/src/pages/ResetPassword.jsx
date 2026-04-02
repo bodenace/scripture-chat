@@ -94,12 +94,7 @@ function ResetPassword() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-3">
-              <div className="w-14 h-14 bg-scripture-navy rounded-xl flex items-center justify-center shadow-soft">
-                <span className="text-white text-3xl">✝</span>
-              </div>
-              <h1 className="text-3xl font-display text-scripture-navy">
-                ScriptureChat
-              </h1>
+              <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-12" />
             </Link>
           </div>
 
@@ -134,12 +129,7 @@ function ResetPassword() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-3">
-            <div className="w-14 h-14 bg-scripture-navy rounded-xl flex items-center justify-center shadow-soft">
-              <span className="text-white text-3xl">✝</span>
-            </div>
-            <h1 className="text-3xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-12" />
           </Link>
         </div>
 
@@ -212,9 +202,9 @@ function ResetPassword() {
 
         {/* Scripture Quote */}
         <p className="text-center text-gray-500 mt-6 italic">
-          "Forget the former things; do not dwell on the past. See, I am doing a new thing!"
+          "Behold, he who has repented of his sins, the same is forgiven, and I, the Lord, remember them no more."
           <br />
-          <span className="text-sm">— Isaiah 43:18-19</span>
+          <span className="text-sm">— D&C 58:42</span>
         </p>
       </div>
     </div>

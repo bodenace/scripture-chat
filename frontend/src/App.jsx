@@ -1,6 +1,6 @@
 /**
  * Main App Component
- * Handles routing and layout for ScriptureChat
+ * Handles routing and layout for Faith AI
  */
 
 import { Routes, Route, Navigate } from 'react-router-dom';

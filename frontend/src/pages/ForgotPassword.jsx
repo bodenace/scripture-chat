@@ -35,12 +35,7 @@ function ForgotPassword() {
           {/* Logo */}
           <div className="text-center mb-8">
             <Link to="/" className="inline-flex items-center space-x-3">
-              <div className="w-14 h-14 bg-scripture-navy rounded-xl flex items-center justify-center shadow-soft">
-                <span className="text-white text-3xl">✝</span>
-              </div>
-              <h1 className="text-3xl font-display text-scripture-navy">
-                ScriptureChat
-              </h1>
+              <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-12" />
             </Link>
           </div>
 
@@ -75,12 +70,7 @@ function ForgotPassword() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link to="/" className="inline-flex items-center space-x-3">
-            <div className="w-14 h-14 bg-scripture-navy rounded-xl flex items-center justify-center shadow-soft">
-              <span className="text-white text-3xl">✝</span>
-            </div>
-            <h1 className="text-3xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-12" />
           </Link>
         </div>
 
@@ -134,9 +124,9 @@ function ForgotPassword() {
 
         {/* Scripture Quote */}
         <p className="text-center text-gray-500 mt-6 italic">
-          "The Lord is close to the brokenhearted and saves those who are crushed in spirit."
+          "Counsel with the Lord in all thy doings, and he will direct thee for good."
           <br />
-          <span className="text-sm">— Psalm 34:18</span>
+          <span className="text-sm">— Alma 37:37</span>
         </p>
       </div>
     </div>

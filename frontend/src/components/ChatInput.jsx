@@ -5,7 +5,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 
-function ChatInput({ onSend, disabled = false, placeholder = "Ask a question about scripture..." }) {
+function ChatInput({ onSend, disabled = false, placeholder = "Ask a gospel question..." }) {
   const [message, setMessage] = useState('');
   const textareaRef = useRef(null);
 
@@ -61,7 +61,7 @@ function ChatInput({ onSend, disabled = false, placeholder = "Ask a question abo
           {/* Text input */}
           <div className="flex-1 relative">
             <label htmlFor="chat-input" className="sr-only">
-              Your question about scripture
+              Your gospel question
             </label>
             <textarea
               ref={textareaRef}

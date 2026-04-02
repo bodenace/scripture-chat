@@ -55,8 +55,8 @@ function Login() {
       
       if (result.success) {
         // Clear anonymous usage after successful login
-        localStorage.removeItem('scripturechat_anonymous_usage');
-        localStorage.removeItem('scripturechat_pending_messages');
+        localStorage.removeItem('faithai_anonymous_usage');
+        localStorage.removeItem('faithai_pending_messages');
         navigate('/');
       } else {
         setError(result.error);
@@ -78,10 +78,7 @@ function Login() {
       <header className="bg-white shadow-soft">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
-            </div>
-            <span className="text-xl font-display text-scripture-navy">ScriptureChat</span>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
           </Link>
           <Link to="/" className="btn-text">
             Back to Chat
@@ -97,7 +94,7 @@ function Login() {
               Welcome Back
             </h1>
             <p className="text-center text-gray-600 mb-8">
-              Sign in to continue your scripture journey
+              Sign in to continue your gospel study
             </p>
 
             {/* Success message */}

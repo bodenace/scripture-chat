@@ -72,8 +72,8 @@ function SignupPrompt({ onClose }) {
         {/* Content */}
         <div className="text-center">
           {/* Icon */}
-          <div className="w-16 h-16 bg-scripture-gold/20 rounded-full flex items-center justify-center mx-auto mb-4">
-            <span className="text-3xl">📖</span>
+          <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+            <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-16 h-16" />
           </div>
 
           {/* Title */}
@@ -83,7 +83,7 @@ function SignupPrompt({ onClose }) {
 
           {/* Description */}
           <p className="text-lg text-gray-600 mb-6">
-            Continue your scripture journey with unlimited access to ScriptureChat.
+            Continue your gospel study with unlimited access to Faith AI.
           </p>
 
           {/* Pricing */}

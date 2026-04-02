@@ -1,6 +1,6 @@
-# ScriptureChat
+# Faith AI
 
-Biblical wisdom at your fingertips. ScriptureChat is a full-stack web application that helps users explore the Bible and Christian teachings through an AI-powered conversational interface.
+Biblical wisdom at your fingertips. Faith AI is a full-stack web application that helps users explore the Bible and Christian teachings through an AI-powered conversational interface.
 
 ## Features
 
@@ -30,7 +30,7 @@ Biblical wisdom at your fingertips. ScriptureChat is a full-stack web applicatio
 ## Project Structure
 
 ```
-scripturechat/
+faithai/
 ├── backend/
 │   ├── config/
 │   │   └── passport.js          # Auth strategies
@@ -50,7 +50,9 @@ scripturechat/
 ├── frontend/
 │   ├── public/
 │   │   ├── manifest.json        # PWA manifest
-│   │   └── cross.svg            # App icon
+│   │   ├── faith-ai-text-logo.svg  # Text logo
+│   │   ├── faith-ai-icon.svg      # Icon logo
+│   │   └── cross.svg              # Legacy icon
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── ChatBubble.jsx
@@ -95,7 +97,7 @@ scripturechat/
 
 ```bash
 # Navigate to project directory
-cd scripturechat
+cd faithai
 
 # Install all dependencies (root, backend, and frontend)
 npm run install:all
@@ -123,7 +125,7 @@ PORT=5000
 FRONTEND_URL=http://localhost:5173
 
 # MongoDB
-MONGODB_URI=mongodb://localhost:27017/scripturechat
+MONGODB_URI=mongodb://localhost:27017/faithai
 
 # JWT
 JWT_SECRET=your-secure-random-string-here
@@ -151,7 +153,7 @@ FREE_TIER_DAILY_LIMIT=5
 
 1. Create a Stripe account at https://stripe.com
 2. Go to Products and create a new product:
-   - Name: "ScriptureChat Premium"
+   - Name: "Faith AI Premium"
    - Price: $4.99/month recurring
 3. Copy the Price ID to `STRIPE_PRICE_ID`
 4. Set up webhook endpoint:
@@ -276,7 +278,7 @@ MIT License - See LICENSE file for details.
 
 ## Support
 
-For questions or issues, contact: support@scripturechat.com
+For questions or issues, contact: support@faithai.com
 
 ---
 

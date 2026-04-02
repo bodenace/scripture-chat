@@ -34,7 +34,7 @@ router.get('/plans', asyncHandler(async (req, res) => {
       plans: [
         {
           id: 'premium',
-          name: 'ScriptureChat Subscription',
+          name: 'Faith AI Subscription',
           price: 4.99,
           priceId: PREMIUM_PRICE_ID,
           features: [

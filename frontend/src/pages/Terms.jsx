@@ -11,12 +11,7 @@ function Terms() {
       <header className="bg-white shadow-soft">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
-            </div>
-            <h1 className="text-xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
           </Link>
           <Link to="/" className="btn-text">
             Back to Chat
@@ -32,7 +27,7 @@ function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">1. Acceptance of Terms</h2>
             <p>
-              By accessing or using ScriptureChat, you agree to be bound by these Terms of Service. 
+              By accessing or using Faith AI, you agree to be bound by these Terms of Service. 
               If you do not agree to these terms, please do not use our service.
             </p>
           </section>
@@ -40,17 +35,18 @@ function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">2. Description of Service</h2>
             <p>
-              ScriptureChat is an AI-powered Bible study assistant that helps users explore and understand 
-              Christian scripture. Our service uses artificial intelligence to provide responses about 
-              Biblical topics, but should not be considered a replacement for pastoral guidance, 
-              professional counseling, or personal Bible study.
+              Faith AI is an AI-powered scripture study assistant designed for members of The Church of Jesus Christ 
+              of Latter-day Saints. Our service uses artificial intelligence to provide responses about 
+              Latter-day Saint scripture and teachings, including the Book of Mormon, Bible, Doctrine and 
+              Covenants, and Pearl of Great Price. Faith AI should not be considered a replacement for guidance 
+              from Church leaders, personal revelation, or individual scripture study.
             </p>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">3. Subscription and Payment</h2>
             <ul className="list-disc pl-6 space-y-2 mt-3">
-              <li>ScriptureChat offers a monthly subscription service at $4.99 per month.</li>
+              <li>Faith AI offers a monthly subscription service at $4.99 per month.</li>
               <li>Payment is processed securely through Stripe.</li>
               <li>Subscriptions automatically renew monthly unless cancelled.</li>
               <li>You may cancel your subscription at any time through your account dashboard.</li>
@@ -60,7 +56,7 @@ function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">4. User Accounts</h2>
-            <p>To use ScriptureChat's full features, you must:</p>
+            <p>To use Faith AI's full features, you must:</p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>Provide accurate and complete registration information</li>
               <li>Maintain the security of your account credentials</li>
@@ -71,7 +67,7 @@ function Terms() {
 
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">5. Acceptable Use</h2>
-            <p>When using ScriptureChat, you agree NOT to:</p>
+            <p>When using Faith AI, you agree NOT to:</p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>Use the service for any unlawful purpose</li>
               <li>Attempt to manipulate or abuse the AI system</li>
@@ -85,23 +81,23 @@ function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">6. AI Limitations and Disclaimer</h2>
             <p>
-              <strong>Important:</strong> ScriptureChat uses artificial intelligence to generate responses. 
-              While we strive for accuracy and faithfulness to Biblical teachings:
+              <strong>Important:</strong> Faith AI uses artificial intelligence to generate responses. 
+              While we strive for accuracy and faithfulness to Latter-day Saint teachings:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>AI responses may occasionally contain errors or misinterpretations</li>
-              <li>The service is not a substitute for reading the Bible directly</li>
-              <li>Responses should not replace guidance from qualified pastors or theologians</li>
-              <li>For serious spiritual, emotional, or life decisions, seek appropriate professional counsel</li>
-              <li>Different Christian denominations may interpret scripture differently</li>
+              <li>The service is not a substitute for reading the scriptures directly</li>
+              <li>Responses should not replace guidance from bishops, stake presidents, or other Church leaders</li>
+              <li>For serious spiritual, emotional, or life decisions, seek appropriate counsel from Church leaders or qualified professionals</li>
+              <li>Always seek confirmation through personal prayer and the guidance of the Holy Ghost</li>
             </ul>
           </section>
 
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">7. Intellectual Property</h2>
             <p>
-              The ScriptureChat service, including its design, features, and content (excluding Bible verses 
-              which are in the public domain or used under license), is owned by ScriptureChat and protected 
+              The Faith AI service, including its design, features, and content (excluding scripture passages 
+              which are in the public domain or used under license), is owned by Faith AI and protected 
               by intellectual property laws.
             </p>
           </section>
@@ -109,7 +105,7 @@ function Terms() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">8. Limitation of Liability</h2>
             <p>
-              ScriptureChat is provided "as is" without warranties of any kind. We are not liable for:
+              Faith AI is provided "as is" without warranties of any kind. We are not liable for:
             </p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li>Decisions made based on AI responses</li>
@@ -155,14 +151,14 @@ function Terms() {
               If you have questions about these Terms of Service, please contact us at:
             </p>
             <p className="mt-3">
-              <strong>Email:</strong> support@scripturechat.com
+              <strong>Email:</strong> support@faithai.com
             </p>
           </section>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <Link to="/" className="btn-primary">
-            Return to ScriptureChat
+            Return to Faith AI
           </Link>
         </div>
       </main>

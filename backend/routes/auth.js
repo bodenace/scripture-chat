@@ -80,7 +80,7 @@ router.post('/register', authLimiter, registerValidation, asyncHandler(async (re
 
   res.status(201).json({
     success: true,
-    message: 'Account created successfully! Welcome to ScriptureChat.',
+    message: 'Account created successfully! Welcome to Faith AI.',
     data: {
       user: {
         id: user._id,
@@ -139,7 +139,7 @@ router.post('/login', authLimiter, loginValidation, asyncHandler(async (req, res
 
   res.json({
     success: true,
-    message: 'Welcome back to ScriptureChat!',
+    message: 'Welcome back to Faith AI!',
     data: {
       user: {
         id: user._id,

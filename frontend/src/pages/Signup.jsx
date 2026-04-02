@@ -55,8 +55,8 @@ function Signup() {
       
       if (result.success) {
         // Clear anonymous usage
-        localStorage.removeItem('scripturechat_anonymous_usage');
-        localStorage.removeItem('scripturechat_pending_messages');
+        localStorage.removeItem('faithai_anonymous_usage');
+        localStorage.removeItem('faithai_pending_messages');
         
         // Now redirect to Stripe checkout
         try {
@@ -92,10 +92,7 @@ function Signup() {
       <header className="bg-white shadow-soft">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
-            </div>
-            <span className="text-xl font-display text-scripture-navy">ScriptureChat</span>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
           </Link>
           <Link to="/" className="btn-text">
             Back to Chat
@@ -111,7 +108,7 @@ function Signup() {
               Get Unlimited Access
             </h1>
             <p className="text-center text-gray-600 mb-2">
-              Continue exploring God's Word with ScriptureChat
+              Continue exploring the restored gospel with Faith AI
             </p>
             
             {/* Pricing badge */}
@@ -262,7 +259,7 @@ function Signup() {
             <div className="mt-6 p-4 bg-scripture-cream rounded-xl">
               <p className="font-medium text-scripture-navy mb-2">What you get:</p>
               <ul className="space-y-1 text-sm text-gray-600">
-                <li>✓ Unlimited scripture questions</li>
+                <li>✓ Unlimited gospel questions</li>
                 <li>✓ Save your conversation history</li>
                 <li>✓ Priority responses</li>
                 <li>✓ Cancel anytime</li>

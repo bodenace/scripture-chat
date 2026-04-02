@@ -23,7 +23,7 @@ export function AuthProvider({ children }) {
    */
   useEffect(() => {
     const initAuth = async () => {
-      const token = localStorage.getItem('scripturechat_token');
+      const token = localStorage.getItem('faithai_token');
       
       if (!token) {
         setLoading(false);
@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
       } catch (err) {
         console.error('Auth initialization error:', err);
         // Clear invalid token
-        localStorage.removeItem('scripturechat_token');
+        localStorage.removeItem('faithai_token');
         api.clearAuthToken();
       } finally {
         setLoading(false);
@@ -61,7 +61,7 @@ export function AuthProvider({ children }) {
       const { token, user: userData } = response.data;
       
       // Store token and update state
-      localStorage.setItem('scripturechat_token', token);
+      localStorage.setItem('faithai_token', token);
       api.setAuthToken(token);
       setUser(userData);
       
@@ -84,7 +84,7 @@ export function AuthProvider({ children }) {
       const { token, user: userData } = response.data;
       
       // Store token and update state
-      localStorage.setItem('scripturechat_token', token);
+      localStorage.setItem('faithai_token', token);
       api.setAuthToken(token);
       setUser(userData);
       
@@ -104,7 +104,7 @@ export function AuthProvider({ children }) {
     
     try {
       // Store token
-      localStorage.setItem('scripturechat_token', token);
+      localStorage.setItem('faithai_token', token);
       api.setAuthToken(token);
       
       // Fetch user data
@@ -113,7 +113,7 @@ export function AuthProvider({ children }) {
       
       return { success: true };
     } catch (err) {
-      localStorage.removeItem('scripturechat_token');
+      localStorage.removeItem('faithai_token');
       api.clearAuthToken();
       const message = err.response?.data?.message || 'Authentication failed.';
       setError(message);
@@ -125,7 +125,7 @@ export function AuthProvider({ children }) {
    * Logout user
    */
   const logout = useCallback(() => {
-    localStorage.removeItem('scripturechat_token');
+    localStorage.removeItem('faithai_token');
     api.clearAuthToken();
     setUser(null);
     setError(null);

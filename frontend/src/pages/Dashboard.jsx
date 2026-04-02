@@ -170,12 +170,7 @@ function Dashboard() {
       <header className="bg-white shadow-soft">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
-            </div>
-            <h1 className="text-xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
           </Link>
           
           <nav className="flex items-center space-x-3">
@@ -330,7 +325,7 @@ function Dashboard() {
                   Subscription Required
                 </h3>
                 <p className="text-gray-600 mb-4">
-                  Subscribe to continue asking unlimited scripture questions.
+                  Subscribe to continue asking unlimited gospel questions.
                 </p>
                 <ul className="text-gray-600 space-y-1 mb-4">
                   <li>✓ Unlimited questions</li>
@@ -405,7 +400,7 @@ function Dashboard() {
             </button>
             
             <p className="text-sm text-gray-500 text-center">
-              Need help? Contact us at support@scripturechat.com
+              Need help? Contact us at support@faithai.com
             </p>
           </div>
         </section>

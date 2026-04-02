@@ -11,12 +11,7 @@ function Privacy() {
       <header className="bg-white shadow-soft">
         <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-scripture-navy rounded-lg flex items-center justify-center">
-              <span className="text-white text-xl">✝</span>
-            </div>
-            <h1 className="text-xl font-display text-scripture-navy">
-              ScriptureChat
-            </h1>
+            <img src="/faith-ai-text-logo.svg" alt="Faith AI" className="h-10" />
           </Link>
           <Link to="/" className="btn-text">
             Back to Chat
@@ -32,9 +27,9 @@ function Privacy() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">1. Introduction</h2>
             <p>
-              Welcome to ScriptureChat. We respect your privacy and are committed to protecting your personal data. 
+              Welcome to Faith AI. We respect your privacy and are committed to protecting your personal data. 
               This privacy policy explains how we collect, use, and safeguard your information when you use our 
-              AI-powered Bible study service.
+              AI-powered Latter-day Saint scripture study service.
             </p>
           </section>
 
@@ -44,7 +39,7 @@ function Privacy() {
             <ul className="list-disc pl-6 space-y-2 mt-3">
               <li><strong>Account Information:</strong> Email address, name, and password when you create an account.</li>
               <li><strong>Payment Information:</strong> Payment details are processed securely by Stripe. We do not store your full credit card number.</li>
-              <li><strong>Chat History:</strong> Your conversations with ScriptureChat are stored to provide continuity and improve your experience.</li>
+              <li><strong>Chat History:</strong> Your conversations with Faith AI are stored to provide continuity and improve your experience.</li>
               <li><strong>Usage Data:</strong> Information about how you interact with our service, including questions asked and features used.</li>
             </ul>
           </section>
@@ -53,7 +48,7 @@ function Privacy() {
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">3. How We Use Your Information</h2>
             <p>We use your information to:</p>
             <ul className="list-disc pl-6 space-y-2 mt-3">
-              <li>Provide and maintain our Bible study AI service</li>
+              <li>Provide and maintain our scripture study AI service</li>
               <li>Process your subscription payments</li>
               <li>Save your chat history for your convenience</li>
               <li>Send important service updates and notifications</li>
@@ -107,7 +102,7 @@ function Privacy() {
           <section>
             <h2 className="text-xl font-semibold text-scripture-navy mt-8 mb-4">8. Children's Privacy</h2>
             <p>
-              ScriptureChat is not intended for children under 13 years of age. We do not knowingly 
+              Faith AI is not intended for children under 13 years of age. We do not knowingly 
               collect personal information from children under 13.
             </p>
           </section>
@@ -126,14 +121,14 @@ function Privacy() {
               If you have any questions about this privacy policy or our data practices, please contact us at:
             </p>
             <p className="mt-3">
-              <strong>Email:</strong> support@scripturechat.com
+              <strong>Email:</strong> support@faithai.com
             </p>
           </section>
         </div>
 
         <div className="mt-12 pt-8 border-t border-gray-200">
           <Link to="/" className="btn-primary">
-            Return to ScriptureChat
+            Return to Faith AI
           </Link>
         </div>
       </main>

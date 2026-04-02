@@ -48,7 +48,7 @@ apiClient.interceptors.response.use(
       // Handle 401 - Unauthorized
       if (status === 401) {
         // Clear token and redirect to login if not already there
-        localStorage.removeItem('scripturechat_token');
+        localStorage.removeItem('faithai_token');
         if (window.location.pathname !== '/login') {
           window.location.href = '/login?session=expired';
         }

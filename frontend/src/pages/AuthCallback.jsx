@@ -37,8 +37,8 @@ function AuthCallback() {
         
         if (result.success) {
           // Clear anonymous usage after successful auth
-          localStorage.removeItem('scripturechat_anonymous_usage');
-          localStorage.removeItem('scripturechat_pending_messages');
+          localStorage.removeItem('faithai_anonymous_usage');
+          localStorage.removeItem('faithai_pending_messages');
           navigate('/');
         } else {
           setError(result.error || 'Authentication failed.');

@@ -9,23 +9,17 @@ const nodemailer = require('nodemailer');
  * Create email transporter based on environment
  */
 const createTransporter = () => {
-  // For production, use a real email service (SendGrid, Mailgun, AWS SES, etc.)
-  // For development, you can use Ethereal (fake SMTP) or your Gmail
-  
   if (process.env.NODE_ENV === 'production') {
-    // Production: Use configured SMTP settings
     return nodemailer.createTransport({
       host: process.env.SMTP_HOST,
       port: process.env.SMTP_PORT || 587,
-      secure: process.env.SMTP_SECURE === 'true', // true for 465, false for other ports
+      secure: process.env.SMTP_SECURE === 'true',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
       }
     });
   } else {
-    // Development: Use Gmail or Ethereal
-    // For Gmail, enable "Less secure app access" or use App Password
     if (process.env.SMTP_USER && process.env.SMTP_PASS) {
       return nodemailer.createTransport({
         host: process.env.SMTP_HOST || 'smtp.gmail.com',
@@ -38,7 +32,6 @@ const createTransporter = () => {
       });
     }
     
-    // Fallback: Log email to console (no actual email sent)
     return {
       sendMail: async (options) => {
         console.log('========== EMAIL (Development Mode) ==========');
@@ -64,13 +57,13 @@ const sendPasswordResetEmail = async (email, resetToken, frontendUrl) => {
   const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
   
   const mailOptions = {
-    from: process.env.EMAIL_FROM || '"ScriptureChat" <noreply@scripturechat.com>',
+    from: process.env.EMAIL_FROM || '"Faith AI" <noreply@faithai.com>',
     to: email,
-    subject: 'Reset Your ScriptureChat Password',
+    subject: 'Reset Your Faith AI Password',
     text: `
 Hello,
 
-You requested to reset your password for your ScriptureChat account.
+You requested to reset your password for your Faith AI account.
 
 Please click the link below to reset your password:
 ${resetUrl}
@@ -80,9 +73,9 @@ This link will expire in 1 hour.
 If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.
 
 Blessings,
-The ScriptureChat Team
+The Faith AI Team
 
-"Trust in the LORD with all your heart and lean not on your own understanding." - Proverbs 3:5
+"Counsel with the Lord in all thy doings, and he will direct thee for good." - Alma 37:37
     `.trim(),
     html: `
 <!DOCTYPE html>
@@ -119,19 +112,19 @@ The ScriptureChat Team
 <body>
   <div class="container">
     <div class="header">
-      <h1>✝ ScriptureChat</h1>
+      <h1>Faith AI</h1>
     </div>
     <div class="content">
       <p>Hello,</p>
-      <p>You requested to reset your password for your ScriptureChat account.</p>
+      <p>You requested to reset your password for your Faith AI account.</p>
       <p>Please click the button below to reset your password:</p>
       <p style="text-align: center;">
         <a href="${resetUrl}" class="button">Reset Password</a>
       </p>
       <p><strong>This link will expire in 1 hour.</strong></p>
       <p>If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.</p>
-      <p>Blessings,<br>The ScriptureChat Team</p>
-      <p class="verse">"Trust in the LORD with all your heart and lean not on your own understanding." - Proverbs 3:5</p>
+      <p>Blessings,<br>The Faith AI Team</p>
+      <p class="verse">"Counsel with the Lord in all thy doings, and he will direct thee for good." - Alma 37:37</p>
     </div>
     <div class="footer">
       <p>If the button doesn't work, copy and paste this link into your browser:</p>
