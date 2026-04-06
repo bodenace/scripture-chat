@@ -85,6 +85,8 @@ const extraOrigins = process.env.ADDITIONAL_CORS_ORIGINS
 
 const allowedOrigins = [
   process.env.FRONTEND_URL,
+  'https://www.faith-ai.org',
+  'https://faith-ai.org',
   'http://localhost:5173',
   'http://localhost:3000',
   ...extraOrigins
