@@ -4,6 +4,32 @@
  */
 
 require('dotenv').config();
+
+// ===========================================
+// Startup Validation — fail fast if env is misconfigured
+// ===========================================
+const REQUIRED_ENV_VARS = ['JWT_SECRET', 'MONGODB_URI'];
+const PROD_REQUIRED_ENV_VARS = ['STRIPE_WEBHOOK_SECRET'];
+
+const missingEnv = REQUIRED_ENV_VARS.filter(v => !process.env[v]);
+if (missingEnv.length) {
+  console.error(`❌ Missing required environment variables: ${missingEnv.join(', ')}`);
+  process.exit(1);
+}
+
+if (process.env.JWT_SECRET && process.env.JWT_SECRET.length < 32) {
+  console.error('❌ JWT_SECRET must be at least 32 characters long for security');
+  process.exit(1);
+}
+
+if (process.env.NODE_ENV === 'production') {
+  const missingProd = PROD_REQUIRED_ENV_VARS.filter(v => !process.env[v]);
+  if (missingProd.length) {
+    console.error(`❌ Missing required production environment variables: ${missingProd.join(', ')}`);
+    process.exit(1);
+  }
+}
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -47,26 +73,36 @@ const app = express();
 // ===========================================
 app.use(helmet());
 
+// Trust the first proxy (needed for express-rate-limit to see real client IPs
+// behind Vercel, Railway, Render, Heroku, Nginx, etc.)
+app.set('trust proxy', 1);
+
 // CORS configuration for frontend
+// Add extra origins via comma-separated ADDITIONAL_CORS_ORIGINS env var
+const extraOrigins = process.env.ADDITIONAL_CORS_ORIGINS
+  ? process.env.ADDITIONAL_CORS_ORIGINS.split(',').map(o => o.trim()).filter(Boolean)
+  : [];
+
 const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:5173',
   'http://localhost:3000',
-  'https://scripture-chat-xi.vercel.app',
-  'https://scripture-chat.vercel.app'
-].filter(Boolean);
+  ...extraOrigins
+].filter(Boolean).map(o => o.replace(/\/$/, '').toLowerCase());
 
 app.use(cors({
   origin: function(origin, callback) {
-    // Allow requests with no origin (mobile apps, curl, etc.)
+    // Allow requests with no origin (server-to-server, curl, mobile apps)
     if (!origin) return callback(null, true);
-    
-    if (allowedOrigins.some(allowed => origin.startsWith(allowed.replace(/\/$/, '')))) {
+
+    const normalised = origin.replace(/\/$/, '').toLowerCase();
+    if (allowedOrigins.includes(normalised)) {
       return callback(null, true);
     }
-    
-    // In production, log unknown origins for debugging
-    console.log('CORS blocked origin:', origin);
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('CORS blocked origin:', origin);
+    }
     callback(new Error('Not allowed by CORS'));
   },
   credentials: true,

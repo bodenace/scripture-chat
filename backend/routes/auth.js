@@ -6,12 +6,34 @@
 const express = require('express');
 const router = express.Router();
 const passport = require('passport');
+const crypto = require('crypto');
 const { body, validationResult } = require('express-validator');
 const User = require('../models/User');
 const { protect, generateToken } = require('../middleware/auth');
 const { asyncHandler, ApiError } = require('../middleware/errorHandler');
 const { authLimiter } = require('../middleware/rateLimiter');
 const { sendPasswordResetEmail } = require('../utils/email');
+
+// ===========================================
+// One-Time OAuth Code Store
+// Short-lived (5 min) opaque codes exchanged for JWTs so that JWTs are
+// never passed through URLs (avoids browser history / referrer leakage).
+// ===========================================
+const oauthCodes = new Map();
+
+function createOAuthCode(userId) {
+  const code = crypto.randomBytes(32).toString('hex');
+  oauthCodes.set(code, { userId: userId.toString(), expires: Date.now() + 5 * 60 * 1000 });
+  return code;
+}
+
+// Clean up stale codes every minute
+setInterval(() => {
+  const now = Date.now();
+  for (const [code, data] of oauthCodes.entries()) {
+    if (data.expires < now) oauthCodes.delete(code);
+  }
+}, 60 * 1000);
 
 // ===========================================
 // Validation Rules
@@ -421,13 +443,54 @@ router.get('/google/callback',
     failureRedirect: `${process.env.FRONTEND_URL}/login?error=google_auth_failed`
   }),
   (req, res) => {
-    // Generate JWT token
-    const token = generateToken(req.user._id);
-    
-    // Redirect to frontend with token
-    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?token=${token}`);
+    // Issue a short-lived one-time code instead of a JWT so that tokens
+    // are never exposed in browser history, server logs, or Referer headers.
+    const code = createOAuthCode(req.user._id);
+    res.redirect(`${process.env.FRONTEND_URL}/auth/callback?code=${code}`);
   }
 );
+
+/**
+ * @route   POST /api/auth/oauth/exchange
+ * @desc    Exchange a one-time OAuth code for a JWT
+ * @access  Public
+ */
+router.post('/oauth/exchange', authLimiter, asyncHandler(async (req, res) => {
+  const { code } = req.body;
+
+  if (!code || typeof code !== 'string') {
+    throw new ApiError('A valid code is required.', 400);
+  }
+
+  const entry = oauthCodes.get(code);
+
+  // Always delete the code on lookup (prevents timing-based reuse)
+  oauthCodes.delete(code);
+
+  if (!entry || entry.expires < Date.now()) {
+    throw new ApiError('Code is invalid or has expired. Please sign in again.', 401);
+  }
+
+  const user = await User.findById(entry.userId);
+  if (!user || !user.isActive) {
+    throw new ApiError('User not found.', 401);
+  }
+
+  const token = generateToken(user._id);
+
+  res.json({
+    success: true,
+    data: {
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+        subscription: user.subscription.status
+      }
+    }
+  });
+}));
 
 /**
  * @route   DELETE /api/auth/account

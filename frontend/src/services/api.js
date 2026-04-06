@@ -132,6 +132,13 @@ const api = {
   },
 
   /**
+   * Exchange a one-time OAuth code (from callback URL) for a JWT
+   */
+  exchangeOAuthCode(code) {
+    return apiClient.post('/auth/oauth/exchange', { code });
+  },
+
+  /**
    * Request password reset email
    */
   forgotPassword(email) {

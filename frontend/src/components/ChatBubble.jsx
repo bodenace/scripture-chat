@@ -114,8 +114,7 @@ function ChatBubble({ message, onFeedback }) {
       {/* Avatar */}
       <div className={`flex-shrink-0 ${isUser ? 'order-1 mr-3' : 'order-2 ml-3'}`}>
         <div 
-          className={`w-10 h-10 rounded-full flex items-center justify-center text-white
-            ${isUser ? 'bg-scripture-gold' : 'bg-scripture-navy'}`}
+          className={`w-10 h-10 rounded-full flex items-center justify-center bg-scripture-gold`}
           aria-hidden="true"
         >
           {isUser ? (
@@ -123,7 +122,7 @@ function ChatBubble({ message, onFeedback }) {
               <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
             </svg>
           ) : (
-            <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-6 h-6" />
+            <img src="/faith-ai-icon.svg" alt="Faith AI" className="w-7 h-7" />
           )}
         </div>
       </div>

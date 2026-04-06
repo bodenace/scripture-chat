@@ -409,12 +409,17 @@ router.post('/webhook', asyncHandler(async (req, res) => {
 
   let event;
 
+  // In production the webhook secret is mandatory (validated at startup).
+  // In non-production it can be omitted only for local testing.
+  if (!webhookSecret && process.env.NODE_ENV === 'production') {
+    console.error('STRIPE_WEBHOOK_SECRET is not set — rejecting webhook');
+    return res.status(500).send('Webhook configuration error');
+  }
+
   try {
-    // Verify webhook signature
     if (webhookSecret) {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } else {
-      // For testing without signature verification
       event = JSON.parse(req.body.toString());
     }
   } catch (err) {

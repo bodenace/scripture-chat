@@ -68,26 +68,28 @@ const requirePremium = asyncHandler(async (req, res, next) => {
 });
 
 /**
- * Check if user can ask a question
- * Paid users have unlimited questions
+ * Check if user can ask a question.
+ * Free users get FREE_TIER_DAILY_LIMIT (default 5) questions per day.
+ * Premium users are unlimited.
  */
 const checkQuestionLimit = asyncHandler(async (req, res, next) => {
   if (!req.user) {
     throw new ApiError('Please log in to access this resource.', 401);
   }
 
-  // All authenticated users with active subscription can ask unlimited questions
-  if (req.user.subscription.status === 'premium') {
-    req.questionsRemaining = Infinity;
-    req.resetTime = null;
-    return next();
+  const { canAsk, remaining, resetTime } = req.user.canAskQuestion();
+
+  if (!canAsk) {
+    throw new ApiError(
+      `You've used your ${parseInt(process.env.FREE_TIER_DAILY_LIMIT) || 5} free messages for today. ` +
+      'Upgrade to Premium for unlimited questions, or come back tomorrow.',
+      402
+    );
   }
 
-  // Users without premium subscription need to subscribe
-  throw new ApiError(
-    'Please subscribe to continue asking questions.',
-    402 // Payment Required
-  );
+  req.questionsRemaining = remaining;
+  req.resetTime = resetTime;
+  next();
 });
 
 /**

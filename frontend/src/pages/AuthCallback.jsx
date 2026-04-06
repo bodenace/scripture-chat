@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import api from '../services/api';
 
 function AuthCallback() {
   const [error, setError] = useState(null);
@@ -16,8 +17,7 @@ function AuthCallback() {
 
   useEffect(() => {
     const handleCallback = async () => {
-      // Get token from URL
-      const token = searchParams.get('token');
+      const code = searchParams.get('code');
       const errorParam = searchParams.get('error');
 
       if (errorParam) {
@@ -26,17 +26,20 @@ function AuthCallback() {
         return;
       }
 
-      if (!token) {
-        setError('No authentication token received.');
+      if (!code) {
+        setError('No authentication code received.');
         setTimeout(() => navigate('/login'), 2000);
         return;
       }
 
       try {
+        // Exchange the one-time code for a JWT (code is consumed server-side)
+        const response = await api.exchangeOAuthCode(code);
+        const { token } = response.data;
+
         const result = await loginWithToken(token);
-        
+
         if (result.success) {
-          // Clear anonymous usage after successful auth
           localStorage.removeItem('faithai_anonymous_usage');
           localStorage.removeItem('faithai_pending_messages');
           navigate('/');
@@ -45,7 +48,7 @@ function AuthCallback() {
           setTimeout(() => navigate('/login'), 2000);
         }
       } catch (err) {
-        setError('Failed to complete authentication.');
+        setError('Failed to complete authentication. The sign-in link may have expired.');
         setTimeout(() => navigate('/login'), 2000);
       }
     };
