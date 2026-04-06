@@ -198,6 +198,13 @@ function Home() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Clear messages and start a fresh conversation (count is preserved)
+  const handleNewChat = () => {
+    setMessages([]);
+    setCurrentChatId(null);
+    setError(null);
+  };
+
   // Save anonymous usage to localStorage
   const saveAnonymousUsage = (count, msgs) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({
@@ -581,6 +588,18 @@ function Home() {
                 </Link>
               ) : (
                 <>
+                  {messages.length > 0 && (
+                    <button
+                      onClick={handleNewChat}
+                      className="flex items-center gap-1.5 px-3 py-2 text-sm text-scripture-navy border border-scripture-navy/30 rounded-lg hover:bg-scripture-navy/5 transition-colors"
+                      title="Start a new conversation"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                      </svg>
+                      New Chat
+                    </button>
+                  )}
                   <Link to="/login" className="btn-text">
                     Sign In
                   </Link>
