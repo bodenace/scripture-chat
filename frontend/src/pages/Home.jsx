@@ -1,7 +1,7 @@
 /**
  * Home Page
  * Main chat interface for Faith AI - accessible to everyone
- * Prompts account creation after 25 free messages
+ * Prompts account creation after 5 free messages
  */
 
 import { useState, useEffect, useRef } from 'react';
@@ -13,7 +13,7 @@ import ChatBubble from '../components/ChatBubble';
 import SignupPrompt from '../components/SignupPrompt';
 
 // Number of free messages before requiring signup
-const FREE_MESSAGE_LIMIT = 25;
+const FREE_MESSAGE_LIMIT = 5;
 const STORAGE_KEY = 'faithai_anonymous_usage';
 
 function Home() {
