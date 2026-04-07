@@ -70,6 +70,12 @@ function App() {
         <Route path="/privacy" element={<Privacy />} />
         <Route path="/terms" element={<Terms />} />
 
+        {/* Ad campaign landing routes - render chat with topic-specific questions */}
+        <Route path="/scriptures" element={<Home />} />
+        <Route path="/ask" element={<Home />} />
+        <Route path="/comefollowme" element={<Home />} />
+        <Route path="/talks" element={<Home />} />
+
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

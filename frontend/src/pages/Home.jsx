@@ -5,8 +5,9 @@
  */
 
 import { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { getCurrentCFMQuestions } from '../data/comefollowme';
 import api from '../services/api';
 import ChatInput from '../components/ChatInput';
 import ChatBubble from '../components/ChatBubble';
@@ -16,9 +17,74 @@ import SignupPrompt from '../components/SignupPrompt';
 const FREE_MESSAGE_LIMIT = 5;
 const STORAGE_KEY = 'faithai_anonymous_usage';
 
+const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
+
+const TOPIC_QUESTIONS = {
+  scriptures: [
+    "What does Moroni 10:4-5 actually mean in simple terms?",
+    "Can you explain 2 Nephi 2 like I'm new to it?",
+    "What is Alma 32 teaching about faith step-by-step?",
+    "What does Mosiah 2:17 really mean in context?",
+    "Can you break down Doctrine and Covenants 121:34-46?",
+    "What does the Book of Mormon teach about repentance?",
+    "How is the Atonement described across different scriptures?",
+    "What scripture should I read if I'm feeling lost right now?",
+    "What can I learn from Nephi's response to hard things?",
+    "How do I study the scriptures in a way that actually sticks?",
+  ],
+  comefollowme: [
+    "What is this week's Come Follow Me lesson about?",
+    "Help me prepare to teach this week's Come Follow Me at home",
+    "What are the key themes in this week's Come Follow Me reading?",
+    "Give me discussion questions for this week's Come Follow Me lesson",
+    "How do I make Come Follow Me more engaging for my family?",
+    "What activities work well for Come Follow Me with young kids?",
+    "Can you summarize the main points of this week's chapters?",
+    "What cross-references connect to this week's Come Follow Me?",
+  ],
+  // comefollowme is handled dynamically below via getCurrentCFMQuestions()
+  talks: [
+    "What did President Nelson say in the most recent General Conference?",
+    "What talks should I read when I'm struggling with doubt?",
+    "Can you summarize a recent General Conference talk about faith?",
+    "What are some of the most powerful General Conference talks ever?",
+    "What did Elder Holland say about staying in the Church?",
+    "Are there talks specifically about anxiety or mental health?",
+    "What General Conference talks are best for someone investigating the Church?",
+    "What talk should I share with someone going through a hard time?",
+  ],
+  ask: [
+    "How do I know if something is the Spirit or just my thoughts?",
+    "How do I stay consistent with scripture study when I'm busy?",
+    "What should I pray about if I don't know what to say?",
+    "How can I feel closer to God again?",
+    "What do I do when I feel spiritually burnt out?",
+    "How do I explain my beliefs without sounding weird?",
+    "Is it wrong that I struggle to live certain commandments?",
+    "How do I balance career goals with church responsibilities?",
+  ],
+};
+
+function getQuestionsForPath(pathname) {
+  const topic = pathname.replace('/', '');
+
+  if (topic === 'comefollowme') {
+    // Use this week's specific lesson questions, fall back to generic CFM questions
+    return getCurrentCFMQuestions() ?? pick(TOPIC_QUESTIONS.comefollowme, 4);
+  }
+
+  if (TOPIC_QUESTIONS[topic]) {
+    return pick(TOPIC_QUESTIONS[topic], 4);
+  }
+
+  // Default: random mix of scripture, normal, and vulnerable questions
+  return null;
+}
+
 function Home() {
   const { user, isAuthenticated, refreshUser } = useAuth();
-  
+  const { pathname } = useLocation();
+
   // State
   const [messages, setMessages] = useState([]);
   const [currentChatId, setCurrentChatId] = useState(null); // Track current chat for authenticated users
@@ -54,6 +120,10 @@ function Home() {
   });
 
   const [suggestedQuestions] = useState(() => {
+    const topicQuestions = getQuestionsForPath(pathname);
+    if (topicQuestions) return topicQuestions;
+
+    // Default random mix for the home route
     const scriptureQuestions = [
       "What does Moroni 10:4-5 actually mean in simple terms?",
       "Can you explain 2 Nephi 2 like I'm new to it?",
@@ -113,8 +183,6 @@ function Home() {
       "What if my family doesn't support my faith?",
       "What should I do if I don't feel like going to church?"
     ];
-
-    const pick = (arr, n) => [...arr].sort(() => Math.random() - 0.5).slice(0, n);
 
     const scripture2 = pick(scriptureQuestions, 2);
     const includeVulnerable = Math.random() < 0.5;
@@ -369,7 +437,7 @@ function Home() {
 
   // Calculate remaining messages for anonymous users
   const remainingMessages = isAuthenticated 
-    ? (user?.subscription === 'premium' ? Infinity : user?.usage?.remaining || 5)
+    ? (user?.subscription?.status === 'premium' ? Infinity : user?.usage?.remaining || 5)
     : Math.max(0, FREE_MESSAGE_LIMIT - messageCount);
 
   return (
