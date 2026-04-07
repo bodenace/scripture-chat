@@ -5,6 +5,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
+import { setEnhancedMatch } from '../utils/pinterest';
 
 // Create context
 const AuthContext = createContext(null);
@@ -37,6 +38,7 @@ export function AuthProvider({ children }) {
         // Fetch current user
         const response = await api.getCurrentUser();
         setUser(response.data.user);
+        setEnhancedMatch(response.data.user?.email);
       } catch (err) {
         console.error('Auth initialization error:', err);
         // Clear invalid token
@@ -64,6 +66,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('faithai_token', token);
       api.setAuthToken(token);
       setUser(userData);
+      setEnhancedMatch(userData?.email);
       
       return { success: true };
     } catch (err) {
@@ -87,6 +90,7 @@ export function AuthProvider({ children }) {
       localStorage.setItem('faithai_token', token);
       api.setAuthToken(token);
       setUser(userData);
+      setEnhancedMatch(userData?.email);
       
       return { success: true };
     } catch (err) {
@@ -110,6 +114,7 @@ export function AuthProvider({ children }) {
       // Fetch user data
       const response = await api.getCurrentUser();
       setUser(response.data.user);
+      setEnhancedMatch(response.data.user?.email);
       
       return { success: true };
     } catch (err) {
@@ -180,7 +185,7 @@ export function AuthProvider({ children }) {
     refreshUser,
     clearError,
     isAuthenticated: !!user,
-    isPremium: user?.subscription === 'premium'
+    isPremium: user?.subscription?.status === 'premium'
   };
 
   return (

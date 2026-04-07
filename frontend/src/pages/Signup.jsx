@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { trackSignup, trackCheckout } from '../utils/pinterest';
 
 function Signup() {
   const [name, setName] = useState('');
@@ -57,9 +58,12 @@ function Signup() {
         // Clear anonymous usage
         localStorage.removeItem('faithai_anonymous_usage');
         localStorage.removeItem('faithai_pending_messages');
-        
+
+        trackSignup();
+
         // Now redirect to Stripe checkout
         try {
+          trackCheckout(4.99);
           const checkoutResponse = await api.createCheckoutSession();
           if (checkoutResponse.data?.url) {
             window.location.href = checkoutResponse.data.url;

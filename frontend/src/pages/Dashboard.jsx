@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import { trackPurchase } from '../utils/pinterest';
 
 function Dashboard() {
   const { user, refreshUser, updateProfile, logout } = useAuth();
@@ -15,6 +16,7 @@ function Dashboard() {
   
   // State
   const [subscription, setSubscription] = useState(null);
+  const [chatCount, setChatCount] = useState(null);
   const [loading, setLoading] = useState(true);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
@@ -34,16 +36,37 @@ function Dashboard() {
           // Verify the session and activate subscription
           const response = await api.verifyCheckoutSession(sessionId);
           if (response.success) {
+            trackPurchase(4.99);
             setMessage({ type: 'success', text: 'Thank you! Your subscription is now active.' });
-            // Refresh subscription status
+            const subResponse = await api.getSubscriptionStatus();
+            setSubscription(subResponse.data.subscription);
+            refreshUser();
+          } else {
+            // Stripe may not have provisioned the subscription yet — fall back to sync
+            try {
+              const syncResponse = await api.syncSubscription();
+              if (syncResponse.data?.isPremium || syncResponse.data?.status === 'premium') {
+                setMessage({ type: 'success', text: 'Thank you! Your subscription is now active.' });
+              } else {
+                setMessage({ type: 'success', text: 'Payment received! Your subscription will activate within a minute.' });
+              }
+            } catch {
+              setMessage({ type: 'success', text: 'Payment received! Your subscription will activate within a minute.' });
+            }
             const subResponse = await api.getSubscriptionStatus();
             setSubscription(subResponse.data.subscription);
             refreshUser();
           }
         } catch (err) {
           console.error('Failed to verify session:', err);
-          setMessage({ type: 'success', text: 'Payment received! Your subscription should be active shortly.' });
+          // Last resort: try syncing directly from Stripe
+          try {
+            await api.syncSubscription();
+          } catch { /* ignore */ }
+          const subResponse = await api.getSubscriptionStatus();
+          setSubscription(subResponse.data.subscription);
           refreshUser();
+          setMessage({ type: 'success', text: 'Payment received! Your subscription should be active shortly.' });
         }
       } else if (searchParams.get('canceled') === 'true') {
         setMessage({ type: 'info', text: 'Subscription process was canceled.' });
@@ -53,12 +76,16 @@ function Dashboard() {
     verifySession();
   }, [searchParams, refreshUser]);
 
-  // Fetch subscription status
+  // Fetch subscription status and chat count
   useEffect(() => {
-    const fetchSubscription = async () => {
+    const fetchData = async () => {
       try {
-        const response = await api.getSubscriptionStatus();
-        setSubscription(response.data.subscription);
+        const [subResponse, historyResponse] = await Promise.all([
+          api.getSubscriptionStatus(),
+          api.getChatHistory().catch(() => ({ data: { chats: [] } }))
+        ]);
+        setSubscription(subResponse.data.subscription);
+        setChatCount(historyResponse.data?.chats?.length ?? 0);
       } catch (err) {
         console.error('Failed to fetch subscription:', err);
       } finally {
@@ -66,7 +93,7 @@ function Dashboard() {
       }
     };
 
-    fetchSubscription();
+    fetchData();
   }, []);
 
   /**
@@ -377,9 +404,9 @@ function Dashboard() {
             </div>
             <div className="p-4 bg-gray-50 rounded-xl text-center">
               <p className="text-3xl font-bold text-scripture-navy">
-                {Math.floor((Date.now() - new Date(user?.createdAt).getTime()) / (1000 * 60 * 60 * 24)) || 1}
+                {chatCount ?? '—'}
               </p>
-              <p className="text-gray-600">Days with Us</p>
+              <p className="text-gray-600">Conversations</p>
             </div>
           </div>
         </section>
