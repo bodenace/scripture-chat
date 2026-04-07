@@ -189,8 +189,10 @@ router.get('/me', protect, asyncHandler(async (req, res) => {
         id: req.user._id,
         email: req.user.email,
         name: req.user.name,
-        subscription: req.user.subscription.status,
-        subscriptionEnd: req.user.subscription.currentPeriodEnd,
+        subscription: {
+          status: req.user.subscription.status,
+          currentPeriodEnd: req.user.subscription.currentPeriodEnd
+        },
         usage: {
           questionsToday: req.user.usage.questionsToday,
           totalQuestions: req.user.usage.totalQuestions,
